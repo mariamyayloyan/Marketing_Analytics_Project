@@ -1,0 +1,5 @@
+notification_id,notification_type
+1,Email
+2,SMS
+3,Social Media
+4,In-app
