@@ -17,8 +17,6 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
-# Define the base directory for the data files
-
 base_dir = os.path.join(script_dir, "..", "etl", "Data")
 
 customer = pd.read_csv(os.path.join(base_dir, "customer.csv"))
@@ -101,7 +99,7 @@ def visualize_metrics(metrics_dict):
     # Convert metrics to a DataFrame
     metrics_df = pd.DataFrame(metrics_dict).T  # Transpose for easier plotting
 
-    # Ensure all numeric values are float (ROC AUC might be 'N/A')
+    # Making sure all numeric values are float
     metrics_df = metrics_df.apply(pd.to_numeric, errors='coerce')
 
     # 1. Grouped Bar Chart
