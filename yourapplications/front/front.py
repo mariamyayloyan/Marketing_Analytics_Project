@@ -85,9 +85,6 @@ def solutions_page():
 
 # Page 3: Pricing
 
-import streamlit as st
-
-
 def pricing_page():
     st.markdown("# Pricing Plans")
 
