@@ -1,26 +1,11 @@
-import os
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 import sqlalchemy
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
-from sklearn.ensemble import RandomForestClassifier, BaggingClassifier
 from sklearn.linear_model import LogisticRegression
-from xgboost import XGBClassifier
-from sklearn.linear_model import LinearRegression
-from sklearn.svm import SVR
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy import create_engine
-import pandas as pd
-
-# Define your engine (assuming it's already defined in Database.database)
 from yourapplications.etl.Database.database import *
-
-from sqlalchemy import create_engine
-from sqlalchemy import inspect  # Import the SQLAlchemy inspector
 
 def fetch_table_as_dataframe(table_name):
     """
@@ -127,7 +112,6 @@ print(coefficients.sort_values(by="Coefficient", ascending=False))
 X_full = merged_table.drop(columns=['status', 'is_churned'])
 y_proba_full = log_reg_model.predict_proba(X_full)[:, 1]
 
-# Add churn probabilities to the results DataFrame
 results['churn_probability'] = y_proba_full
 
 # Define function to update results table in the database
@@ -140,12 +124,10 @@ def update_results_table(results_df):
     except Exception as e:
         print(f"Failed to update results table: {e}")
 
-# Update the database
 update_results_table(results)
 
 """ Checking results"""
 
-# Fetch and display the results table
 updated_results = fetch_table_as_dataframe("results")
 print(updated_results.head())
 
