@@ -5,9 +5,6 @@ from sqlalchemy.orm import sessionmaker, Session, relationship
 from sqlalchemy.orm import declarative_base
 Base = declarative_base()
 
-from yourapplications.etl.Database.database import *
-Base.metadata.drop_all(bind=engine)
-Base.metadata.create_all(bind=engine)
 
 
 class Location(Base):
@@ -26,6 +23,7 @@ class Customer(Base):
     birth_date = Column(Date)
     age = Column(Integer)
     location = Column(String, ForeignKey("location.area_name"))
+    email = Column(String, unique=True)
 
 
 class Plan(Base):
@@ -83,3 +81,11 @@ class Subscription(Base):
     price = relationship("Price", back_populates="subscriptions")
     notification = relationship("Notification", back_populates="subscriptions")
 
+class results(Base):
+    __tablename__ = "results"
+    id = Column(Integer, primary_key=True, index=True)
+    customer_id = Column(Integer, ForeignKey("customer.customer_id"), nullable=False)
+    churn_probability = Column(DECIMAL)
+    cluster_number = Column(Integer)
+
+    customer = relationship("Customer", back_populates="results")

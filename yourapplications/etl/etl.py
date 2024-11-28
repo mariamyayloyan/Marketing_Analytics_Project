@@ -1,5 +1,5 @@
+from Database.database import *
 from Database.models import *
-from Database.database import engine, Base
 import pandas as pd
 import logging
 import glob
@@ -60,9 +60,10 @@ folder_path = "Data/*.csv"
 # Use glob to get a list of file paths in the specified folder
 files = glob.glob(folder_path)
 base_names = [path.splitext(path.basename(file))[0] for file in files]
-
+logger.info(base_names)
 # Load each CSV into its corresponding database table
 for table in base_names:
+    logger.info(f"Processing {table}")
     try:
         load_csv_to_table(table, path.join("Data", f"{table}.csv"))
     except Exception as e:
