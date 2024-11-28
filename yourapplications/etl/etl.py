@@ -1,10 +1,8 @@
-from yourapplications.etl.Database.database import *
-from yourapplications.etl.Database.models import *
-
+from Database.models import *
+from Database.database import engine, Base
 import pandas as pd
 import logging
 import glob
-from sqlalchemy.sql import text
 from os import path
 
 # Configure logging
@@ -12,18 +10,19 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-def drop_and_recreate_schema():
+def drop_table_with_cascade(table_name):
     """
-    Drop and recreate the database schema.
+    Drop a table with CASCADE if it exists.
+
+    Args:
+        table_name (str): Name of the table to drop.
     """
     try:
         with engine.connect() as connection:
-            # Drop the entire schema and recreate it
-            connection.execute(text("DROP SCHEMA public CASCADE;"))
-            connection.execute(text("CREATE SCHEMA public;"))
-            logger.info("Successfully dropped and recreated schema.")
+            connection.execute(text(f"DROP TABLE IF EXISTS {table_name} CASCADE"))
+            logger.info(f"Successfully dropped table: {table_name}")
     except Exception as e:
-        logger.error(f"Failed to drop and recreate schema: {e}")
+        logger.error(f"Failed to drop table {table_name}: {e}")
 
 
 def load_csv_to_table(table_name, csv_path):
@@ -68,6 +67,5 @@ for table in base_names:
         load_csv_to_table(table, path.join("Data", f"{table}.csv"))
     except Exception as e:
         logger.error(f"Failed to ingest table {table}: {e}")
-
 
 logger.info("Tables are populated.")
