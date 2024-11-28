@@ -56,7 +56,7 @@ merged_table['end_date'] = pd.to_datetime(merged_table['end_date'])
 
 merged_table['subscription_duration'] = (merged_table['end_date'] - merged_table['start_date']).dt.days
 
-columns_to_drop = ['first_name', 'last_name', 'location_id', 'customer_id','email', 'app_id', 'plan_type_id','application_id_y','area_name','id_x',  'id_y', 'start_date','end_date', 'plan_id_x', 'plan_id_y', 'notification_id','application_id_x','price_id' ]
+columns_to_drop = ['first_name', 'last_name', 'location_id', 'birth_date','customer_id','email', 'app_id', 'plan_type_id','application_id_y','area_name','id_x',  'id_y', 'start_date','end_date', 'plan_id_x', 'plan_id_y', 'notification_id','application_id_x','price_id' ]
 merged_table = merged_table.drop(columns=columns_to_drop)
 
 
