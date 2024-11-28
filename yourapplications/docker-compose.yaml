@@ -1,5 +1,12 @@
 services:
 
+  postgresql_db:
+    image: postgres
+    environment:
+      POSTGRES_USER: subscriptionpostgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: subscription
+
   db:
     container_name: postgresql_db
     image: postgres
@@ -32,14 +39,16 @@ services:
       - db
 
   etl:
+
     container_name: etl
     build:
       context: ./etl
       dockerfile: Dockerfile
+      #command: python /yourapplications/etl/etl.py
     ports:
       - 3000:3000
     volumes:
-        - ./etl:/etl
+        - ./yourapplications:/yourapplications
     depends_on: 
       - db
     #condition: service_healthy

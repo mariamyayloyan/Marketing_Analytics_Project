@@ -1,5 +1,6 @@
 from Database.models import *
 from Database.database import engine, Base
+from sqlalchemy import create_engine, text, inspect
 import pandas as pd
 import logging
 import glob
@@ -8,15 +9,10 @@ from os import path
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+logging.basicConfig()
 
 
 def drop_table_with_cascade(table_name):
-    """
-    Drop a table with CASCADE if it exists.
-
-    Args:
-        table_name (str): Name of the table to drop.
-    """
     try:
         with engine.connect() as connection:
             connection.execute(text(f"DROP TABLE IF EXISTS {table_name} CASCADE"))
@@ -26,20 +22,8 @@ def drop_table_with_cascade(table_name):
 
 
 def load_csv_to_table(table_name, csv_path):
-    """
-     Load data from a CSV file into a database table.
-
-     Args:
-     - table_name: Name of the database table.
-     - csv_path: Path to the CSV file containing data.
-
-     Returns:
-     - None
-     """
     try:
         df = pd.read_csv(csv_path)
-
-        # Use replace to overwrite the table (for testing)
         df.to_sql(table_name, con=engine, if_exists="replace", index=False)
         logger.info(f"Successfully loaded {table_name}")
     except pd.errors.ParserError as e:
@@ -48,6 +32,19 @@ def load_csv_to_table(table_name, csv_path):
         logger.error(f"Failed to load table {table_name}: {e}")
 
 
+def validate_table_schema(table_name):
+    inspector = inspect(engine)
+    try:
+        columns = inspector.get_columns(table_name)
+        logger.info(f"Schema for table {table_name}: {columns}")
+    except Exception as e:
+        logger.error(f"Failed to validate schema for table {table_name}: {e}")
+
+
+# Drop and recreate tables
+drop_table_with_cascade("results")
+Base.metadata.create_all(bind=engine)
+logger.info("Tables have been recreated.")
 
 # Check if Data folder exists
 if not path.exists("Data"):
@@ -67,5 +64,8 @@ for table in base_names:
         load_csv_to_table(table, path.join("Data", f"{table}.csv"))
     except Exception as e:
         logger.error(f"Failed to ingest table {table}: {e}")
+
+# Validate schema for the results table
+validate_table_schema("results")
 
 logger.info("Tables are populated.")
