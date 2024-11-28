@@ -1,5 +1,7 @@
+# Base Image
 FROM python:3.10-slim-bullseye
 
+# Install dependencies
 RUN apt-get update && apt-get install -y \
     build-essential libpq-dev libfreetype6-dev libpng-dev libjpeg-dev \
     libblas-dev liblapack-dev gfortran \
@@ -8,16 +10,16 @@ RUN apt-get update && apt-get install -y \
 # Set working directory
 WORKDIR /etl
 
-# Copy requirements file and install dependencies
+# Copy requirements and install Python dependencies
 COPY requirements.txt .
 RUN pip3 install --upgrade pip
 RUN pip3 install -r requirements.txt
 
-# Copy the rest of the application code
+# Copy application code
 COPY . .
 
-# Expose port 3000
+# Expose the application port
 EXPOSE 3000
 
-# Command to run the python file
+# Define default command
 CMD ["python", "etl.py"]

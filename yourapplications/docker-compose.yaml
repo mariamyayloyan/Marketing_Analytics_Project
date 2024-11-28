@@ -1,7 +1,7 @@
 services:
 
   db:
-    container_name: db_postgresql
+    container_name: postgresql_db
     image: postgres
     restart: always
     ports:
@@ -41,10 +41,12 @@ services:
     volumes:
         - ./etl:/etl
     depends_on: 
-      db:
-        condition: service_healthy
+      - db
+    #condition: service_healthy
     healthcheck:
       test: "exit 0"
+
+
   
   back:
     build:
@@ -73,3 +75,4 @@ services:
       - API_URL=http://api:8000
     depends_on:
       - back
+

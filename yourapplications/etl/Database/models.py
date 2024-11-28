@@ -1,17 +1,19 @@
 from pydantic import BaseModel
 from sqlalchemy import create_engine, Column, Integer, Float, Date, String, ForeignKey, DECIMAL
-from sqlalchemy.ext.declarative import declarative_base
+#from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session, relationship
-
-
-
+from sqlalchemy.orm import declarative_base
 Base = declarative_base()
+
+from yourapplications.etl.Database.database import *
+Base.metadata.drop_all(bind=engine)
+Base.metadata.create_all(bind=engine)
 
 
 class Location(Base):
     __tablename__ = "location"
     location_id = Column(Integer, primary_key=True, index=True)
-    area_name = Column(String)
+    area_name = Column(String, unique = True)
 
     subscriptions = relationship("Subscription", back_populates="location")
 
@@ -35,7 +37,7 @@ class Plan(Base):
 
 class Application(Base):
     __tablename__ = "application"
-    app_id = Column(Integer, primary_key=True, index=True,autoincrement=True)
+    application_id = Column(Integer, primary_key=True, index=True,autoincrement=True)
     application_name = Column(String, index=True)
     subscriptions = relationship("Subscription", back_populates="application")
 

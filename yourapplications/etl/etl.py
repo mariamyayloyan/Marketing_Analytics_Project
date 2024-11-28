@@ -9,25 +9,45 @@ from os import path
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def load_csv_to_table(table_name, csv_path):
+
+def drop_table_with_cascade(table_name):
     """
-    Load data from a CSV file into a database table.
+    Drop a table with CASCADE if it exists.
 
     Args:
-    - table_name: Name of the database table.
-    - csv_path: Path to the CSV file containing data.
-
-    Returns:
-    - None
+        table_name (str): Name of the table to drop.
     """
     try:
+        with engine.connect() as connection:
+            connection.execute(text(f"DROP TABLE IF EXISTS {table_name} CASCADE"))
+            logger.info(f"Successfully dropped table: {table_name}")
+    except Exception as e:
+        logger.error(f"Failed to drop table {table_name}: {e}")
+
+
+def load_csv_to_table(table_name, csv_path):
+    """
+     Load data from a CSV file into a database table.
+
+     Args:
+     - table_name: Name of the database table.
+     - csv_path: Path to the CSV file containing data.
+
+     Returns:
+     - None
+     """
+    try:
         df = pd.read_csv(csv_path)
-        df.to_sql(table_name, con=engine, if_exists="append", index=False)
+
+        # Use replace to overwrite the table (for testing)
+        df.to_sql(table_name, con=engine, if_exists="replace", index=False)
         logger.info(f"Successfully loaded {table_name}")
     except pd.errors.ParserError as e:
         logger.error(f"Failed to parse {csv_path}: {e}")
     except Exception as e:
         logger.error(f"Failed to load table {table_name}: {e}")
+
+
 
 # Check if Data folder exists
 if not path.exists("Data"):
