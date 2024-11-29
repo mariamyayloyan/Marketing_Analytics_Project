@@ -1,42 +1,112 @@
 import streamlit as st
 import matplotlib.pyplot as plt
+import uuid
 
-# Page configuration
+
 st.set_page_config(
     page_title="Loyalytics",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Page navigation
 page = st.sidebar.radio("Navigate",
                         ["Sign Up / Sign In", "Home", "Solutions", "Pricing", "About"])
 
 
-# Page 0: Sign Up / Sign In
-def signup_signin_page():
-    st.markdown("# Sign Up / Sign In")
-    option = st.selectbox("Choose an option", ["Sign Up", "Sign In"])
+st.markdown(
+    """
+    <style>
+    /* General page style */
+    body {
+        background-color: #0f051d;
+        color: #ffffff;
+        font-family: 'Arial', sans-serif;
+    }
 
-    if option == "Sign Up":
-        st.markdown("## Create a New Account")
-        username = st.text_input("Username")
-        password = st.text_input("Password", type="password")
-        confirm_password = st.text_input("Confirm Password", type="password")
-        if st.button("Sign Up"):
-            if password == confirm_password:
-                st.success("Account created successfully! Please sign in.")
-            else:
-                st.error("Passwords do not match. Please try again.")
-    elif option == "Sign In":
-        st.markdown("## Sign In to Your Account")
-        username = st.text_input("Username")
-        password = st.text_input("Password", type="password")
-        if st.button("Sign In"):
-            st.success("Signed in successfully!")
+    h1 {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    /* Card styling */
+    .card {
+        background-color: #1c0c45;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+        text-align: center;
+    }
+
+    .card h3 {
+        color: #ffffff;
+        font-size: 24px;
+        margin-bottom: 10px;
+    }
+
+    .card .price {
+        color: #ffffff;
+        font-size: 36px;
+        font-weight: bold;
+    }
+
+    .card p {
+        color: #a8a8a8;
+        font-size: 16px;
+        margin-bottom: 15px;
+    }
+
+    .card ul {
+        list-style: none;
+        padding: 0;
+        margin-bottom: 20px;
+    }
+
+    .card ul li {
+        color: #ffffff;
+        font-size: 16px;
+        margin: 5px 0;
+    }
+
+    .best-deal {
+        border: 2px solid #9e6ef3;
+        border-radius: 15px;
+        padding: 5px;
+        color: #9e6ef3;
+        font-size: 14px;
+        display: inline-block;
+        margin-bottom: 10px;
+    }
+
+    /* Button styling */
+    .button {
+        background-color: #9e6ef3;
+        border: none;
+        color: #ffffff;
+        padding: 10px 20px;
+        border-radius: 50px;
+        cursor: pointer;
+        font-size: 16px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .button:hover {
+        background-color: #8457cc;
+    }
+
+    .button span {
+        margin-right: 10px;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
 
-# Page 1: Home
+# Page 0: Home page
+
 def home_page():
     st.markdown("# Grow your Business with us!")
     st.markdown("### Loyalytics – Empowering businesses to build lasting connections.")
@@ -48,87 +118,362 @@ def home_page():
     st.write("Sign up | Solutions | Pricing | About")
 
 
-# Page 2: Solutions
+home_page()
+
+
+# Page 1: Sign Up / Sign In
+def signup_signin_page():
+    st.markdown("# Sign Up / Sign In")
+
+    select_key = f"signup_signin_option_{str(uuid.uuid4())}"
+    option = st.selectbox("Choose an option", ["Sign Up", "Sign In"], key=select_key)
+
+    if option == "Sign Up":
+        st.markdown("## Create a New Account")
+        username = st.text_input("Username", key=f"signup_username_{str(uuid.uuid4())}")
+        password = st.text_input("Password", type="password", key=f"signup_password_{str(uuid.uuid4())}")
+        confirm_password = st.text_input("Confirm Password", type="password",
+                                         key=f"signup_confirm_password_{str(uuid.uuid4())}")
+        if st.button("Sign Up", key=f"signup_button_{str(uuid.uuid4())}"):
+            if password == confirm_password:
+                st.success("Account created successfully! Please sign in.")
+            else:
+                st.error("Passwords do not match. Please try again.")
+
+    elif option == "Sign In":
+        st.markdown("## Sign In to Your Account")
+        username = st.text_input("Username", key=f"signin_username_{str(uuid.uuid4())}")
+        password = st.text_input("Password", type="password", key=f"signin_password_{str(uuid.uuid4())}")
+        if st.button("Sign In", key=f"signin_button_{str(uuid.uuid4())}"):
+            st.success("Signed in successfully!")
+
+
+signup_signin_page()
+
+
+USER_DATA = {
+    "name": "Daniel",
+    "surname": "Ek",
+    "company": "Spotify",
+    "profile_pic": "image.png"
+}
+
+
+def user_profile_page():
+    if "signed_in" in st.session_state and st.session_state["signed_in"]:
+        col1, col2 = st.columns([1, 3])
+
+        with col1:
+            st.markdown("Company Image")
+
+        with col2:
+            st.markdown(f"### {USER_DATA['name']} {USER_DATA['surname']}")
+            st.markdown(f"**Company:** {USER_DATA['company']}")
+            st.markdown("---")
+
+            if st.button("My Results"):
+                st.session_state["page"] = "MyResults"
+            if st.button("Solutions"):
+                st.session_state["page"] = "Solutions"
+            if st.button("Settings"):
+                st.session_state["page"] = "Settings"
+
+        if "page" in st.session_state:
+            if st.session_state["page"] == "MyResults":
+                st.write("Redirecting to My Results page...")
+            elif st.session_state["page"] == "Solutions":
+                st.write("Redirecting to Solutions page...")
+            elif st.session_state["page"] == "Settings":
+                st.write("Redirecting to Settings page...")
+
+    else:
+        st.warning("Please sign in first.")
+
+
+if __name__ == "__main__":
+    if "signed_in" not in st.session_state:
+        st.session_state["signed_in"] = True
+
+    user_profile_page()
+
+
+AGE_GROUP_DATA = {
+    "Age Group": ["Under 20", "20+", "30+", "40+"],
+    "Retention Rate": [45, 50, 40, 35],
+    "Action": ["Email sent: Welcome message", "Email sent: Promotions", "Email sent: Discounts", "Email sent: Feedback requests"]
+}
+
+DEVICE_DATA = {
+    "Device": ["Android", "iOS", "Windows", "Linux"],
+    "Percentage": [50, 30, 15, 5]
+}
+
+COUNTRY_DATA = {
+    "Country": ["USA", "Canada", "UK", "Germany"],
+    "Percentage": [40, 30, 20, 10],
+    "Action": ["Email campaign: USA", "App notification: Canada", "Discounts: UK", "Survey: Germany"]
+}
+
+
+def my_results_page():
+    st.title("My Results")
+
+    col1, col2, col3 = st.columns(3)
+
+    # 1. Age Group Segment
+    with col1:
+        st.subheader("Age Groups")
+        fig, ax = plt.subplots()
+        ax.bar(AGE_GROUP_DATA["Age Group"], AGE_GROUP_DATA["Retention Rate"], color="skyblue")
+        ax.set_title("Retention by Age Group")
+        ax.set_ylabel("Retention Rate (%)")
+        st.pyplot(fig)
+
+        if st.button("Details: Age Groups"):
+            with st.expander("Age Group Details"):
+                for i, age_group in enumerate(AGE_GROUP_DATA["Age Group"]):
+                    st.write(f"**{age_group}**: {AGE_GROUP_DATA['Action'][i]} (Retention: {AGE_GROUP_DATA['Retention Rate'][i]}%)")
+
+    # 2. Device Segment
+    with col2:
+        st.subheader("Devices")
+        fig, ax = plt.subplots()
+        ax.pie(DEVICE_DATA["Percentage"], labels=DEVICE_DATA["Device"], autopct='%1.1f%%', colors=["blue", "green", "lightblue", "lightgreen"])
+        ax.set_title("Device Distribution")
+        st.pyplot(fig)
+
+        if st.button("Details: Devices"):
+            with st.expander("Device Details"):
+                for i, device in enumerate(DEVICE_DATA["Device"]):
+                    st.write(f"**{device}**: {DEVICE_DATA['Percentage'][i]}% of users.")
+
+    # 3. Country Segment
+    with col3:
+        st.subheader("Countries")
+        fig, ax = plt.subplots()
+        ax.bar(COUNTRY_DATA["Country"], COUNTRY_DATA["Percentage"], color="lightgreen")
+        ax.set_title("Top 4 Countries")
+        ax.set_ylabel("Percentage of Users")
+        st.pyplot(fig)
+
+        if st.button("Details: Countries"):
+            with st.expander("Country Details"):
+                for i, country in enumerate(COUNTRY_DATA["Country"]):
+                    st.write(f"**{country}**: {COUNTRY_DATA['Action'][i]} ({COUNTRY_DATA['Percentage'][i]}% of users).")
+
+
+if __name__ == "__main__":
+    st.session_state["page"] = "MyResults"
+
+    if st.session_state["page"] == "MyResults":
+        my_results_page()
+
+
+SOLUTIONS_DATA = {
+    "Canceled Users": {
+        "Percentage": 11.48,
+        "Email Context": "Subject: We’d Love to Have You Back—Exclusive Offer Inside! 🎶"
+                         
+                         "Body:"
+                         "Hi [User's Name],"
+                         
+                         "We noticed you’ve been away from Spotify Premium, and we’d love to welcome you back! "
+                         "To make it easy, we’re offering you an exclusive deal:"
+                         
+                         "Get 50% off your first 3 months of Premium."
+                         "With Premium, you’ll enjoy:"
+                         "Ad-free listening: No interruptions—just music."
+                         "Offline mode: Download your favorites and listen anywhere."
+                         "Unlimited skips: Always play the perfect song."
+                         
+                         "This special offer is available for a limited time. "
+                         "Join now with This Link so you don’t miss out."
+                         "We can’t wait to see you back in the groove!"
+                         
+                         "Best,"
+                         "The Spotify Team 🎧"
+    },
+
+    "Loyal Users": {
+        "Percentage": 38.31,
+        "Email Context": "Subject: Your 2024 Spotify Wrapped Is Here! 🎉"
+                         
+                         "Body:"
+                         "Hi [User's Name],"
+                         
+                         "It’s been an incredible year of music with you, and we’ve created "
+                         "something special to celebrate!"
+                         "Your Spotify Wrapped 2024 is ready! Click Here to view personalized "
+
+                         "🎵 Top Songs: Your most-loved tracks on repeat."
+                         "🎶 Favorite Genres: Discover the sounds that defined your year."
+                         "⏱️ Total Listening Time: See how much time we’ve spent together!"
+                         
+                         "Thank you for making Spotify a part of your year. "
+                         "Here’s to another year of amazing music together!"
+                         
+                         "Keep listening,"
+                         "The Spotify Team 🎧"
+    },
+
+    "Engaged Users": {
+        "Percentage": 26.09,
+        "Email Context": "Subject: 🎁 Holiday Special: 3 Months of Premium for Just $3.99 🎶"
+                         "Body: "
+                         "Hi [User's Name],"
+                         
+                         "This Black Friday/Christmas, we’re bringing you an exclusive offer "
+                         "to make your Spotify experience even better!"
+                         
+                         "Get 3 months of Spotify Premium for just $3.99."
+                         
+                         "With Premium, you’ll enjoy:"
+                         
+                         "Ad-free listening: Your music, uninterrupted."
+                         "Offline mode: Download and enjoy anywhere."
+                         "Unlimited skips: Always the perfect vibe."
+                         
+                         "This special holiday deal is only available for a limited time—don’t wait!"
+                         "Click here to activate your special offer. "
+                         
+                         "Celebrate the season with the music you love."
+                         
+                         "Cheers,"
+                         "The Spotify Team 🎧"
+    },
+
+    "High-Risk Users": {
+        "Percentage": 24.12,
+        "Email Context": "Subject: We Miss You! Enjoy 1 Month of Premium on Us 🎶"
+                         "Body:"
+                         "Hi [User's Name],"
+                         
+                         "It’s been a while, and we miss having you as part of our Spotify family. "
+                         "We noticed you haven’t "
+                         "been around lately and want to make it easy for you to come back and "
+                         "rediscover your favorite music and podcasts."
+                         "As a special offer, we’re giving you 1 month of Premium for free—no "
+                         "strings attached! Dive back into ad-free listening, "
+                         "unlimited skips, and offline downloads today."
+                         
+                         "Don’t miss this opportunity to reconnect with the music you love. "
+                         "Click here to activate your "
+                         
+                         "We’re excited to have you back!"
+                         
+                         "Best,"
+                         "The Spotify Team 🎧"
+    }
+}
+
+
 def solutions_page():
-    st.markdown("# Audience Analysis")
-    st.write("Audience by Country:")
-    countries = ["USA", "France", "Britain", "Russia", "Other"]
-    audience_count = [3594, 1200, 800, 600, 400]
+    st.title("Solutions")
+    st.write("Here are insights and actions applied for various user categories:")
 
-    fig, ax = plt.subplots()
-    ax.pie(audience_count, labels=countries, autopct='%1.1f%%')
-    st.pyplot(fig)
+    col1, col2 = st.columns(2)
 
-    st.markdown("### Active Hours")
-    hours = ["09:00-12:00", "12:00-18:00", "18:00-22:00", "22:00+"]
-    active_users = [20, 35, 50, 25]
-    st.bar_chart(data=active_users, use_container_width=True)
+    for i, (category, details) in enumerate(SOLUTIONS_DATA.items()):
+        col = col1 if i % 2 == 0 else col2
+        with col:
+            st.subheader(category)
 
-    st.markdown("# Retention Insights")
-    st.write("Retention Rate:")
+            fig, ax = plt.subplots()
+            ax.pie(
+                [details["Percentage"], 100 - details["Percentage"]],
+                labels=[category, "Other"],
+                autopct='%1.1f%%',
+                startangle=90,
+                colors=["skyblue", "lightgray"]
+            )
+            st.pyplot(fig)
 
-    years = [2022, 2023, 2024]
-    retention_rates = [10, 15, 20]
+            if st.button(f"Details: {category}", key=category):
+                with st.expander(f"{category} Details"):
+                    st.write(f"**Percentage**: {details['Percentage']}%")
+                    st.write(f"**Email Context**: {details['Email Context']}")
 
-    fig, ax = plt.subplots()
-    ax.plot(years, retention_rates, marker='o')
-    ax.set_xlabel("Year")
-    ax.set_ylabel("Retention Rate (%)")
-    ax.set_title("Retention Rate Over Time")
-    st.pyplot(fig)
 
-    st.markdown("### Devices")
-    devices = ["Iphone", "Samsung", "Xiaomi", "Google Pixel", "Other"]
-    device_count = [1200, 1000, 800, 400, 200]
-    st.bar_chart(data=device_count, use_container_width=True)
+if __name__ == "__main__":
+    st.session_state["page"] = "Solutions"
+
+    if st.session_state["page"] == "Solutions":
+        solutions_page()
 
 
 # Page 3: Pricing
 
-def pricing_page():
-    st.markdown("# Pricing Plans")
 
-    # Define the columns for pricing plans
+def pricing_page():
+    st.markdown("<h1>Pricing Plans</h1>", unsafe_allow_html=True)
+
     col1, col2, col3 = st.columns(3)
 
-    # Basic Plan
     with col1:
-        st.subheader("Basic")
-        st.markdown("**Price:** $99")
-        st.markdown("Data Analyses and Visualizations for your business!")
-        st.write("- Provide a Dataset")
-        st.write("- Waiting Time: 14 Business Days")
-        st.write("- Get Data insights")
-        st.write("- Think of Strategies")
-        st.button("Start and Think")
+        st.markdown(
+            """
+            <div class="card">
+                <h3>One Data</h3>
+                <p class="price">$99</p>
+                <p>Data Analyses and Visualizations for your business!</p>
+                <ul>
+                    <li>Provide a dataset</li>
+                    <li>Wait 14 business days</li>
+                    <li>Get Data insights</li>
+                    <li>Think of Strategies</li>
+                </ul>
+                <a href="#" class="button"><span>Start and think</span> →</a>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
-    # Pro Plan
     with col2:
-        st.subheader("Advanced")
-        st.markdown("**Price:** $299")
-        st.markdown("Solution Prompts for your Business Problem")
-        st.write("- Provide a Dataset")
-        st.write("- Waiting Time: 7 Business Days")
-        st.write("- Get Data insights")
-        st.write("- Get Numerous Prompts for Customer Retention")
-        st.button("Get Prompts")
+        st.markdown(
+            """
+            <div class="card">
+                <div class="best-deal">#bestdeal</div>
+                <h3>One Data</h3>
+                <p class="price">$299</p>
+                <p>Solution Prompts for your business problem!</p>
+                <ul>
+                    <li>Provide a dataset</li>
+                    <li>Wait 7 business days</li>
+                    <li>Get Data insights</li>
+                    <li>Get numerous prompts for customer retention</li>
+                </ul>
+                <a href="#" class="button"><span>Get Prompts</span> →</a>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
-    # Enterprise Plan
     with col3:
-        st.subheader("Provide a Dataset")
-        st.markdown("**Price** $499")
-        st.markdown("Waiting Time: 3 Business Days")
-        st.write("- Advanced Data Analytics")
-        st.write("- Advanced Security")
-        st.write("- Applied Retention Strategies")
-        st.button("Loyal Customers")
+        st.markdown(
+            """
+            <div class="card">
+                <h3>Enterprise</h3>
+                <p class="price">$499</p>
+                <p>Everything Solved!</p>
+                <ul>
+                    <li>Provide a dataset</li>
+                    <li>Wait 3 business days</li>
+                    <li>Get Advanced Analytics</li>
+                    <li>Advanced Security</li>
+                    <li>Applied Retention Strategies</li>
+                </ul>
+                <a href="#" class="button"><span>Loyal Customers</span> →</a>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
 
-# Display the pricing page when called
 pricing_page()
 
 
 # Page 4: About Loyalytics
+
 def about_loyalytics_page():
     st.markdown("# About Loyalytics")
     st.write(
@@ -138,14 +483,19 @@ def about_loyalytics_page():
     )
     st.markdown("### Features:")
     st.write(
-        "- Segment & Target Effectively: Identify high-risk segments and tailor strategies to engage, retain, and delight customers.")
+        "- Segment & Target Effectively: Identify high-risk segments and tailor "
+        "strategies to engage, retain, and delight customers.")
     st.write(
-        "- Automate Retention Efforts: Set up automated triggers and campaigns to keep customers engaged, without the manual effort.")
+        "- Automate Retention Efforts: Set up automated triggers and campaigns "
+        "to keep customers engaged, without the manual effort.")
     st.write(
-        "- Gain Actionable Insights: Access a user-friendly dashboard to track customer trends, predict churn, and maximize lifetime value.")
+        "- Gain Actionable Insights: Access a user-friendly dashboard to track customer "
+        "trends, predict churn, and maximize lifetime value.")
 
 
-# Rendering pages
+about_loyalytics_page()
+
+
 if page == "Sign Up / Sign In":
     signup_signin_page()
 elif page == "Home":
@@ -156,4 +506,3 @@ elif page == "Retention Insights":
     solutions_page()
 elif page == "About Loyalytics":
     about_loyalytics_page()
-

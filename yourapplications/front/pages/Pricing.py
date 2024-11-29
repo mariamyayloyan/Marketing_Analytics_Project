@@ -1,44 +1,163 @@
 import streamlit as st
 
+st.markdown(
+    """
+    <style>
+    /* General page style */
+    body {
+        background-color: #0f051d;
+        color: #ffffff;
+        font-family: 'Arial', sans-serif;
+    }
+
+    h1 {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    /* Card styling */
+    .card {
+        background-color: #1c0c45;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+        text-align: center;
+    }
+
+    .card h3 {
+        color: #ffffff;
+        font-size: 24px;
+        margin-bottom: 10px;
+    }
+
+    .card .price {
+        color: #ffffff;
+        font-size: 36px;
+        font-weight: bold;
+    }
+
+    .card p {
+        color: #a8a8a8;
+        font-size: 16px;
+        margin-bottom: 15px;
+    }
+
+    .card ul {
+        list-style: none;
+        padding: 0;
+        margin-bottom: 20px;
+    }
+
+    .card ul li {
+        color: #ffffff;
+        font-size: 16px;
+        margin: 5px 0;
+    }
+
+    .best-deal {
+        border: 2px solid #9e6ef3;
+        border-radius: 15px;
+        padding: 5px;
+        color: #9e6ef3;
+        font-size: 14px;
+        display: inline-block;
+        margin-bottom: 10px;
+    }
+
+    /* Button styling */
+    .button {
+        background-color: #9e6ef3;
+        border: none;
+        color: #ffffff;
+        padding: 10px 20px;
+        border-radius: 50px;
+        cursor: pointer;
+        font-size: 16px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .button:hover {
+        background-color: #8457cc;
+    }
+
+    .button span {
+        margin-right: 10px;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 
 def pricing_page():
-    st.markdown("# Pricing Plans")
+    st.markdown("<h1>Pricing Plans</h1>", unsafe_allow_html=True)
 
-    # Define the columns for pricing plans
     col1, col2, col3 = st.columns(3)
 
     # Basic Plan
     with col1:
-        st.subheader("Basic")
-        st.markdown("**Price:** $99")
-        st.markdown("Data Analyses and Visualizations for your business!")
-        st.write("- Provide a Dataset")
-        st.write("- Waiting Time: 14 Business Days")
-        st.write("- Get Data insights")
-        st.write("- Think of Strategies")
-        st.button("Start and Think")
+        st.markdown(
+            """
+            <div class="card">
+                <h3>One Data</h3>
+                <p class="price">$99</p>
+                <p>Data Analyses and Visualizations for your business!</p>
+                <ul>
+                    <li>Provide a dataset</li>
+                    <li>Wait 14 business days</li>
+                    <li>Get Data insights</li>
+                    <li>Think of Strategies</li>
+                </ul>
+                <a href="#" class="button"><span>Start and think</span> →</a>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
     # Pro Plan
     with col2:
-        st.subheader("Advanced")
-        st.markdown("**Price:** $299")
-        st.markdown("Solution Prompts for your Business Problem")
-        st.write("- Provide a Dataset")
-        st.write("- Waiting Time: 7 Business Days")
-        st.write("- Get Data insights")
-        st.write("- Get Numerous Prompts for Customer Retention")
-        st.button("Get Prompts")
+        st.markdown(
+            """
+            <div class="card">
+                <div class="best-deal">#bestdeal</div>
+                <h3>One Data</h3>
+                <p class="price">$299</p>
+                <p>Solution Prompts for your business problem!</p>
+                <ul>
+                    <li>Provide a dataset</li>
+                    <li>Wait 7 business days</li>
+                    <li>Get Data insights</li>
+                    <li>Get numerous prompts for customer retention</li>
+                </ul>
+                <a href="#" class="button"><span>Get Prompts</span> →</a>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
     # Enterprise Plan
     with col3:
-        st.subheader("Provide a Dataset")
-        st.markdown("**Price** $499")
-        st.markdown("Waiting Time: 3 Business Days")
-        st.write("- Advanced Data Analytics")
-        st.write("- Advanced Security")
-        st.write("- Applied Retention Strategies")
-        st.button("Loyal Customers")
+        st.markdown(
+            """
+            <div class="card">
+                <h3>Enterprise</h3>
+                <p class="price">$499</p>
+                <p>Everything Solved!</p>
+                <ul>
+                    <li>Provide a dataset</li>
+                    <li>Wait 3 business days</li>
+                    <li>Get Advanced Analytics</li>
+                    <li>Advanced Security</li>
+                    <li>Applied Retention Strategies</li>
+                </ul>
+                <a href="#" class="button"><span>Loyal Customers</span> →</a>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
 
-# Display the pricing page when called
 pricing_page()
