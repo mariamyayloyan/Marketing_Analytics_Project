@@ -15,3 +15,4 @@ def about_loyalytics_page():
     st.write(
         "- Gain Actionable Insights: Access a user-friendly dashboard to track customer trends, predict churn, and maximize lifetime value.")
 
+about_loyalytics_page()

@@ -1,5 +1,4 @@
 import streamlit as st
-import matplotlib.pyplot as plt
 
 
 def home_page():
@@ -11,3 +10,6 @@ def home_page():
 
     st.markdown("\n**LOYALYTICS**")
     st.write("Sign up | Solutions | Pricing | About")
+
+
+home_page()
