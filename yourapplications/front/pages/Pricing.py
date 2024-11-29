@@ -1,11 +1,40 @@
 import streamlit as st
 
+
+def set_page_background():
+    st.markdown(
+        """
+        <style>
+        body {
+            background-color: #001f3f;;
+            color: white;
+        }
+        .stApp {
+            background-color: #001f3f;; 
+            color: white;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            color: #FFFFFF; 
+        }
+        .sidebar .sidebar-content {
+            background-color: #001f3f;; 
+        }
+        .stButton>button {
+            background-color: #003366;
+            color: white;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+
 st.markdown(
     """
     <style>
     /* General page style */
     body {
-        background-color: #0f051d;
+        background-color: #003366;
         color: #ffffff;
         font-family: 'Arial', sans-serif;
     }
@@ -17,7 +46,7 @@ st.markdown(
 
     /* Card styling */
     .card {
-        background-color: #1c0c45;
+        background-color: #003366;
         border-radius: 12px;
         padding: 20px;
         box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
@@ -37,7 +66,7 @@ st.markdown(
     }
 
     .card p {
-        color: #a8a8a8;
+        color: #003366;
         font-size: 16px;
         margin-bottom: 15px;
     }
@@ -93,6 +122,7 @@ st.markdown(
 
 
 def pricing_page():
+    set_page_background()
     st.markdown("<h1>Pricing Plans</h1>", unsafe_allow_html=True)
 
     col1, col2, col3 = st.columns(3)

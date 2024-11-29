@@ -2,7 +2,36 @@ import streamlit as st
 import uuid
 
 
+def set_page_background():
+    st.markdown(
+        """
+        <style>
+        body {
+            background-color: #001f3f;;
+            color: white;
+        }
+        .stApp {
+            background-color: #001f3f;; 
+            color: white;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            color: #FFFFFF; 
+        }
+        .sidebar .sidebar-content {
+            background-color: #001f3f;; 
+        }
+        .stButton>button {
+            background-color: #003366;
+            color: white;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+
 def signup_signin_page():
+    set_page_background()
     st.markdown("# Sign Up / Sign In")
 
     selectbox_key = f"signup_signin_option_{str(uuid.uuid4())}"

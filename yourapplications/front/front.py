@@ -13,12 +13,40 @@ page = st.sidebar.radio("Navigate",
                         ["Sign Up / Sign In", "Home", "Solutions", "Pricing", "About"])
 
 
+def set_page_background():
+    st.markdown(
+        """
+        <style>
+        body {
+            background-color: #001f3f;;
+            color: white;
+        }
+        .stApp {
+            background-color: #001f3f;; 
+            color: white;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            color: #FFFFFF; 
+        }
+        .sidebar .sidebar-content {
+            background-color: #001f3f;; 
+        }
+        .stButton>button {
+            background-color: #003366;
+            color: white;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+
 st.markdown(
     """
     <style>
     /* General page style */
     body {
-        background-color: #0f051d;
+        background-color: #003366;
         color: #ffffff;
         font-family: 'Arial', sans-serif;
     }
@@ -30,7 +58,7 @@ st.markdown(
 
     /* Card styling */
     .card {
-        background-color: #1c0c45;
+        background-color: #003366;
         border-radius: 12px;
         padding: 20px;
         box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
@@ -50,7 +78,7 @@ st.markdown(
     }
 
     .card p {
-        color: #a8a8a8;
+        color: #003366;
         font-size: 16px;
         margin-bottom: 15px;
     }
@@ -368,6 +396,7 @@ SOLUTIONS_DATA = {
 
 
 def solutions_page():
+    set_page_background()
     st.title("Solutions")
     st.write("Here are insights and actions applied for various user categories:")
 
@@ -384,8 +413,9 @@ def solutions_page():
                 labels=[category, "Other"],
                 autopct='%1.1f%%',
                 startangle=90,
-                colors=["skyblue", "lightgray"]
+                colors=["#003366", "skyblue"]
             )
+            ax.set_title(f"{category} Breakdown")
             st.pyplot(fig)
 
             if st.button(f"Details: {category}", key=category):
@@ -402,7 +432,96 @@ if __name__ == "__main__":
 
 
 # Page 3: Pricing
+st.markdown(
+    """
+    <style>
+    /* General page style */
+    body {
+        background-color: #003366;
+        color: #ffffff;
+        font-family: 'Arial', sans-serif;
+    }
 
+    h1 {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    /* Card styling */
+    .card {
+        background-color: #003366;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+        text-align: center;
+    }
+
+    .card h3 {
+        color: #ffffff;
+        font-size: 24px;
+        margin-bottom: 10px;
+    }
+
+    .card .price {
+        color: #ffffff;
+        font-size: 36px;
+        font-weight: bold;
+    }
+
+    .card p {
+        color: #003366;
+        font-size: 16px;
+        margin-bottom: 15px;
+    }
+
+    .card ul {
+        list-style: none;
+        padding: 0;
+        margin-bottom: 20px;
+    }
+
+    .card ul li {
+        color: #ffffff;
+        font-size: 16px;
+        margin: 5px 0;
+    }
+
+    .best-deal {
+        border: 2px solid #9e6ef3;
+        border-radius: 15px;
+        padding: 5px;
+        color: #9e6ef3;
+        font-size: 14px;
+        display: inline-block;
+        margin-bottom: 10px;
+    }
+
+    /* Button styling */
+    .button {
+        background-color: #9e6ef3;
+        border: none;
+        color: #ffffff;
+        padding: 10px 20px;
+        border-radius: 50px;
+        cursor: pointer;
+        font-size: 16px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .button:hover {
+        background-color: #8457cc;
+    }
+
+    .button span {
+        margin-right: 10px;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
 def pricing_page():
     st.markdown("<h1>Pricing Plans</h1>", unsafe_allow_html=True)
