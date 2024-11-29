@@ -10,7 +10,35 @@ st.set_page_config(
 )
 
 page = st.sidebar.radio("Navigate",
-                        ["Sign Up / Sign In", "Home", "Solutions", "Pricing", "About"])
+                        ["Home", "Sign Up / Sign In", "My Profile", "Customer Insights", "Audience Analysis", "Pricing Plans", "About Loyalytics"])
+
+
+def set_page_background():
+    st.markdown(
+        """
+        <style>
+        body {
+            background-color: #001f3f;;
+            color: white;
+        }
+        .stApp {
+            background-color: #001f3f;; 
+            color: white;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            color: #FFFFFF; 
+        }
+        .sidebar .sidebar-content {
+            background-color: #001f3f;; 
+        }
+        .stButton>button {
+            background-color: #003366;
+            color: white;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
 
 
 st.markdown(
@@ -18,7 +46,7 @@ st.markdown(
     <style>
     /* General page style */
     body {
-        background-color: #0f051d;
+        background-color: #003366;
         color: #ffffff;
         font-family: 'Arial', sans-serif;
     }
@@ -30,7 +58,7 @@ st.markdown(
 
     /* Card styling */
     .card {
-        background-color: #1c0c45;
+        background-color: #003366;
         border-radius: 12px;
         padding: 20px;
         box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
@@ -50,7 +78,7 @@ st.markdown(
     }
 
     .card p {
-        color: #a8a8a8;
+        color: #003366;
         font-size: 16px;
         margin-bottom: 15px;
     }
@@ -112,7 +140,7 @@ def home_page():
     st.markdown("### Loyalytics – Empowering businesses to build lasting connections.")
     st.write("Why chase new customers when you can keep the ones you already have hooked and happy? #flexiblesolutions")
 
-    st.button("Start Today")
+    st.markdown("Start Today")
 
     st.markdown("\n**LOYALYTICS**")
     st.write("Sign up | Solutions | Pricing | About")
@@ -160,6 +188,8 @@ USER_DATA = {
 
 
 def user_profile_page():
+    st.title("My Profile")
+
     if "signed_in" in st.session_state and st.session_state["signed_in"]:
         col1, col2 = st.columns([1, 3])
 
@@ -171,15 +201,17 @@ def user_profile_page():
             st.markdown(f"**Company:** {USER_DATA['company']}")
             st.markdown("---")
 
-            if st.button("My Results"):
-                st.session_state["page"] = "MyResults"
-            if st.button("Solutions"):
+            if st.button("My Results", key="results_button"):
+                st.session_state["page"] = "My Results"
+
+            if st.button("Solutions", key="solutions_button"):
                 st.session_state["page"] = "Solutions"
-            if st.button("Settings"):
+
+            if st.button("Settings", key="settings_button"):
                 st.session_state["page"] = "Settings"
 
         if "page" in st.session_state:
-            if st.session_state["page"] == "MyResults":
+            if st.session_state["page"] == "My Results":
                 st.write("Redirecting to My Results page...")
             elif st.session_state["page"] == "Solutions":
                 st.write("Redirecting to Solutions page...")
@@ -199,8 +231,7 @@ if __name__ == "__main__":
 
 AGE_GROUP_DATA = {
     "Age Group": ["Under 20", "20+", "30+", "40+"],
-    "Retention Rate": [45, 50, 40, 35],
-    "Action": ["Email sent: Welcome message", "Email sent: Promotions", "Email sent: Discounts", "Email sent: Feedback requests"]
+    "Percentage": [45, 50, 40, 35]
 }
 
 DEVICE_DATA = {
@@ -210,8 +241,7 @@ DEVICE_DATA = {
 
 COUNTRY_DATA = {
     "Country": ["USA", "Canada", "UK", "Germany"],
-    "Percentage": [40, 30, 20, 10],
-    "Action": ["Email campaign: USA", "App notification: Canada", "Discounts: UK", "Survey: Germany"]
+    "Percentage": [40, 30, 20, 10]
 }
 
 
@@ -224,15 +254,15 @@ def my_results_page():
     with col1:
         st.subheader("Age Groups")
         fig, ax = plt.subplots()
-        ax.bar(AGE_GROUP_DATA["Age Group"], AGE_GROUP_DATA["Retention Rate"], color="skyblue")
-        ax.set_title("Retention by Age Group")
-        ax.set_ylabel("Retention Rate (%)")
+        ax.bar(AGE_GROUP_DATA["Age Group"], AGE_GROUP_DATA["Percentage"], color="skyblue")
+        ax.set_title("Age Group Distribution")
+        ax.set_ylabel("Distribution (%)")
         st.pyplot(fig)
 
         if st.button("Details: Age Groups"):
             with st.expander("Age Group Details"):
                 for i, age_group in enumerate(AGE_GROUP_DATA["Age Group"]):
-                    st.write(f"**{age_group}**: {AGE_GROUP_DATA['Action'][i]} (Retention: {AGE_GROUP_DATA['Retention Rate'][i]}%)")
+                    st.write(f"**{age_group}**: {AGE_GROUP_DATA['Percentage'][i]}% of users")
 
     # 2. Device Segment
     with col2:
@@ -245,7 +275,7 @@ def my_results_page():
         if st.button("Details: Devices"):
             with st.expander("Device Details"):
                 for i, device in enumerate(DEVICE_DATA["Device"]):
-                    st.write(f"**{device}**: {DEVICE_DATA['Percentage'][i]}% of users.")
+                    st.write(f"**{device}**: {DEVICE_DATA['Percentage'][i]}% of users")
 
     # 3. Country Segment
     with col3:
@@ -259,7 +289,7 @@ def my_results_page():
         if st.button("Details: Countries"):
             with st.expander("Country Details"):
                 for i, country in enumerate(COUNTRY_DATA["Country"]):
-                    st.write(f"**{country}**: {COUNTRY_DATA['Action'][i]} ({COUNTRY_DATA['Percentage'][i]}% of users).")
+                    st.write(f"**{country}**: {COUNTRY_DATA['Percentage'][i]}% of users")
 
 
 if __name__ == "__main__":
@@ -368,6 +398,7 @@ SOLUTIONS_DATA = {
 
 
 def solutions_page():
+    set_page_background()
     st.title("Solutions")
     st.write("Here are insights and actions applied for various user categories:")
 
@@ -384,8 +415,9 @@ def solutions_page():
                 labels=[category, "Other"],
                 autopct='%1.1f%%',
                 startangle=90,
-                colors=["skyblue", "lightgray"]
+                colors=["#003366", "skyblue"]
             )
+            ax.set_title(f"{category} Breakdown")
             st.pyplot(fig)
 
             if st.button(f"Details: {category}", key=category):
@@ -402,6 +434,96 @@ if __name__ == "__main__":
 
 
 # Page 3: Pricing
+st.markdown(
+    """
+    <style>
+    /* General page style */
+    body {
+        background-color: #003366;
+        color: #ffffff;
+        font-family: 'Arial', sans-serif;
+    }
+
+    h1 {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    /* Card styling */
+    .card {
+        background-color: #003366;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+        text-align: center;
+    }
+
+    .card h3 {
+        color: #ffffff;
+        font-size: 24px;
+        margin-bottom: 10px;
+    }
+
+    .card .price {
+        color: #ffffff;
+        font-size: 36px;
+        font-weight: bold;
+    }
+
+    .card p {
+        color: #003366;
+        font-size: 16px;
+        margin-bottom: 15px;
+    }
+
+    .card ul {
+        list-style: none;
+        padding: 0;
+        margin-bottom: 20px;
+    }
+
+    .card ul li {
+        color: #ffffff;
+        font-size: 16px;
+        margin: 5px 0;
+    }
+
+    .best-deal {
+        border: 2px solid #9e6ef3;
+        border-radius: 15px;
+        padding: 5px;
+        color: #9e6ef3;
+        font-size: 14px;
+        display: inline-block;
+        margin-bottom: 10px;
+    }
+
+    /* Button styling */
+    .button {
+        background-color: #9e6ef3;
+        border: none;
+        color: #ffffff;
+        padding: 10px 20px;
+        border-radius: 50px;
+        cursor: pointer;
+        font-size: 16px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .button:hover {
+        background-color: #8457cc;
+    }
+
+    .button span {
+        margin-right: 10px;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
 
 def pricing_page():
@@ -495,14 +617,18 @@ def about_loyalytics_page():
 
 about_loyalytics_page()
 
-
-if page == "Sign Up / Sign In":
-    signup_signin_page()
-elif page == "Home":
+if page == "Home":
     home_page()
+elif page == "Sign Up / Sign In":
+    signup_signin_page()
+elif page == "My Profile":
+    user_profile_page()
+elif page == "Customer Insights":
+    my_results_page()
 elif page == "Audience Analysis":
     solutions_page()
-elif page == "Retention Insights":
-    solutions_page()
+elif page == "Pricing Plans":
+    pricing_page()
 elif page == "About Loyalytics":
     about_loyalytics_page()
+

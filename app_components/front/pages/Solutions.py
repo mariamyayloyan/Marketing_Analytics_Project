@@ -101,7 +101,36 @@ SOLUTIONS_DATA = {
 }
 
 
+def set_page_background():
+    st.markdown(
+        """
+        <style>
+        body {
+            background-color: #001f3f;;
+            color: white;
+        }
+        .stApp {
+            background-color: #001f3f;; 
+            color: white;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            color: #FFFFFF; 
+        }
+        .sidebar .sidebar-content {
+            background-color: #001f3f;; 
+        }
+        .stButton>button {
+            background-color: #003366;
+            color: white;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+
 def solutions_page():
+    set_page_background()
     st.title("Solutions")
     st.write("Here are insights and actions applied for various user categories:")
 
@@ -118,8 +147,9 @@ def solutions_page():
                 labels=[category, "Other"],
                 autopct='%1.1f%%',
                 startangle=90,
-                colors=["skyblue", "lightgray"]
+                colors=["#003366", "skyblue"]
             )
+            ax.set_title(f"{category} Breakdown")
             st.pyplot(fig)
 
             if st.button(f"Details: {category}", key=category):
@@ -128,9 +158,5 @@ def solutions_page():
                     st.write(f"**Email Context**: {details['Email Context']}")
 
 
-if __name__ == "__main__":
-    st.session_state["page"] = "Solutions"
-
-    if st.session_state["page"] == "Solutions":
-        solutions_page()
+solutions_page()
 
