@@ -10,7 +10,7 @@ st.set_page_config(
 )
 
 page = st.sidebar.radio("Navigate",
-                        ["Sign Up / Sign In", "Home", "Solutions", "Pricing", "About"])
+                        ["Home", "Sign Up / Sign In", "My Profile", "Customer Insights", "Audience Analysis", "Pricing Plans", "About Loyalytics"])
 
 
 def set_page_background():
@@ -140,7 +140,7 @@ def home_page():
     st.markdown("### Loyalytics – Empowering businesses to build lasting connections.")
     st.write("Why chase new customers when you can keep the ones you already have hooked and happy? #flexiblesolutions")
 
-    st.button("Start Today")
+    st.markdown("Start Today")
 
     st.markdown("\n**LOYALYTICS**")
     st.write("Sign up | Solutions | Pricing | About")
@@ -188,6 +188,8 @@ USER_DATA = {
 
 
 def user_profile_page():
+    st.title("My Profile")
+
     if "signed_in" in st.session_state and st.session_state["signed_in"]:
         col1, col2 = st.columns([1, 3])
 
@@ -199,15 +201,17 @@ def user_profile_page():
             st.markdown(f"**Company:** {USER_DATA['company']}")
             st.markdown("---")
 
-            if st.button("My Results"):
-                st.session_state["page"] = "MyResults"
-            if st.button("Solutions"):
+            if st.button("My Results", key="results_button"):
+                st.session_state["page"] = "My Results"
+
+            if st.button("Solutions", key="solutions_button"):
                 st.session_state["page"] = "Solutions"
-            if st.button("Settings"):
+
+            if st.button("Settings", key="settings_button"):
                 st.session_state["page"] = "Settings"
 
         if "page" in st.session_state:
-            if st.session_state["page"] == "MyResults":
+            if st.session_state["page"] == "My Results":
                 st.write("Redirecting to My Results page...")
             elif st.session_state["page"] == "Solutions":
                 st.write("Redirecting to Solutions page...")
@@ -227,8 +231,7 @@ if __name__ == "__main__":
 
 AGE_GROUP_DATA = {
     "Age Group": ["Under 20", "20+", "30+", "40+"],
-    "Retention Rate": [45, 50, 40, 35],
-    "Action": ["Email sent: Welcome message", "Email sent: Promotions", "Email sent: Discounts", "Email sent: Feedback requests"]
+    "Percentage": [45, 50, 40, 35]
 }
 
 DEVICE_DATA = {
@@ -238,8 +241,7 @@ DEVICE_DATA = {
 
 COUNTRY_DATA = {
     "Country": ["USA", "Canada", "UK", "Germany"],
-    "Percentage": [40, 30, 20, 10],
-    "Action": ["Email campaign: USA", "App notification: Canada", "Discounts: UK", "Survey: Germany"]
+    "Percentage": [40, 30, 20, 10]
 }
 
 
@@ -252,15 +254,15 @@ def my_results_page():
     with col1:
         st.subheader("Age Groups")
         fig, ax = plt.subplots()
-        ax.bar(AGE_GROUP_DATA["Age Group"], AGE_GROUP_DATA["Retention Rate"], color="skyblue")
-        ax.set_title("Retention by Age Group")
-        ax.set_ylabel("Retention Rate (%)")
+        ax.bar(AGE_GROUP_DATA["Age Group"], AGE_GROUP_DATA["Percentage"], color="skyblue")
+        ax.set_title("Age Group Distribution")
+        ax.set_ylabel("Distribution (%)")
         st.pyplot(fig)
 
         if st.button("Details: Age Groups"):
             with st.expander("Age Group Details"):
                 for i, age_group in enumerate(AGE_GROUP_DATA["Age Group"]):
-                    st.write(f"**{age_group}**: {AGE_GROUP_DATA['Action'][i]} (Retention: {AGE_GROUP_DATA['Retention Rate'][i]}%)")
+                    st.write(f"**{age_group}**: {AGE_GROUP_DATA['Percentage'][i]}% of users")
 
     # 2. Device Segment
     with col2:
@@ -273,7 +275,7 @@ def my_results_page():
         if st.button("Details: Devices"):
             with st.expander("Device Details"):
                 for i, device in enumerate(DEVICE_DATA["Device"]):
-                    st.write(f"**{device}**: {DEVICE_DATA['Percentage'][i]}% of users.")
+                    st.write(f"**{device}**: {DEVICE_DATA['Percentage'][i]}% of users")
 
     # 3. Country Segment
     with col3:
@@ -287,7 +289,7 @@ def my_results_page():
         if st.button("Details: Countries"):
             with st.expander("Country Details"):
                 for i, country in enumerate(COUNTRY_DATA["Country"]):
-                    st.write(f"**{country}**: {COUNTRY_DATA['Action'][i]} ({COUNTRY_DATA['Percentage'][i]}% of users).")
+                    st.write(f"**{country}**: {COUNTRY_DATA['Percentage'][i]}% of users")
 
 
 if __name__ == "__main__":
@@ -523,6 +525,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+
 def pricing_page():
     st.markdown("<h1>Pricing Plans</h1>", unsafe_allow_html=True)
 
@@ -614,14 +617,18 @@ def about_loyalytics_page():
 
 about_loyalytics_page()
 
-
-if page == "Sign Up / Sign In":
-    signup_signin_page()
-elif page == "Home":
+if page == "Home":
     home_page()
+elif page == "Sign Up / Sign In":
+    signup_signin_page()
+elif page == "My Profile":
+    user_profile_page()
+elif page == "Customer Insights":
+    my_results_page()
 elif page == "Audience Analysis":
     solutions_page()
-elif page == "Retention Insights":
-    solutions_page()
+elif page == "Pricing Plans":
+    pricing_page()
 elif page == "About Loyalytics":
     about_loyalytics_page()
+

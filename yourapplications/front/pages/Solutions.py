@@ -158,9 +158,5 @@ def solutions_page():
                     st.write(f"**Email Context**: {details['Email Context']}")
 
 
-if __name__ == "__main__":
-    st.session_state["page"] = "Solutions"
-
-    if st.session_state["page"] == "Solutions":
-        solutions_page()
+solutions_page()
 

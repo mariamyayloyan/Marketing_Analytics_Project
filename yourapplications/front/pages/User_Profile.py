@@ -69,8 +69,4 @@ def user_profile_page():
         st.warning("Please sign in first.")
 
 
-if __name__ == "__main__":
-    if "signed_in" not in st.session_state:
-        st.session_state["signed_in"] = True
-
-    user_profile_page()
+user_profile_page()
