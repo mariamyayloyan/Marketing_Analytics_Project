@@ -5,7 +5,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import LogisticRegression
 
-from yourapplications.etl.Database.database import *
+from app_components.etl.Database.database import *
 
 def fetch_table_as_dataframe(table_name):
     """

@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
 
 from sqlalchemy.orm import declarative_base
-from yourapplications.etl.Database.models import *
+from app_components.etl.Database.models import *
 
 # Load environment variables from a .env file
 load_dotenv()
