@@ -8,6 +8,7 @@ import sqlalchemy.orm as orm
 from dotenv import load_dotenv
 import os
 
+load_dotenv(".env")
 
 def get_db():
     """

@@ -5,6 +5,7 @@ import pandas as pd
 import logging
 import glob
 from os import path
+import os 
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

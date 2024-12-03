@@ -1,12 +1,5 @@
 services:
 
-  postgresql_db:
-    image: postgres
-    environment:
-      POSTGRES_USER: subscriptionpostgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: subscription
-
   db:
     container_name: postgresql_db
     image: postgres
@@ -38,23 +31,22 @@ services:
     depends_on: 
       - db
 
-  etl:
 
+  #new etl
+  etl:
     container_name: etl
     build:
       context: ./etl
       dockerfile: Dockerfile
-      #command: python /yourapplications/etl/etl.py
     ports:
       - 3000:3000
     volumes:
-        - ./app_components:/app_components
+        - ./etl:/etl
     depends_on: 
-      - db
-    #condition: service_healthy
+      db:
+        condition: service_healthy
     healthcheck:
       test: "exit 0"
-
 
   
   back:

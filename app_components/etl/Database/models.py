@@ -1,6 +1,8 @@
-from sqlalchemy import create_engine, Column, Integer, Float, Date, String, ForeignKey, DECIMAL
+from sqlalchemy import Column, Integer, Float, Date, String, ForeignKey, DECIMAL
 from sqlalchemy.orm import declarative_base, relationship
 import sqlalchemy.exc
+from Database.database import Base, engine
+
 
 Base = declarative_base()
 
@@ -93,3 +95,5 @@ class Results(Base):
     customer_id = Column(Integer, ForeignKey("customer.customer_id"), nullable=False)
     churn_probability = Column(DECIMAL(5, 2))
     cluster_number = Column(Integer)
+
+Base.metadata.create_all(engine)
