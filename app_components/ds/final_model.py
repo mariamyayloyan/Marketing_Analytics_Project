@@ -4,10 +4,15 @@ import sqlalchemy
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import LogisticRegression
-
 from app_components.etl.Database.database import *
 
-def fetch_table_as_dataframe(table_name):
+"""
+This module builds a logistic regression model for churn prediction and updates the database.
+"""
+
+""" Fetching data from database """
+
+def fetch_table_as_dataframe(table_name: str) -> pd.DataFrame:
     """
     Fetch data from a specific database table and return it as a Pandas DataFrame.
 
@@ -43,8 +48,7 @@ merged_table = merged_table.merge(location, on='location_id', how='inner')
 merged_table = merged_table.merge(price, left_on='price_id', right_on='id', how='inner')
 merged_table = merged_table.merge(notification, on='notification_id', how='inner')
 merged_table = merged_table.merge(plan, left_on='plan_type_id', right_on='plan_id', how='inner')
-#merged_table = merged_table.merge(results, on='customer_id', how='inner')
-#print(merged_table.head())
+
 
 
 """ Cleaning  and labeling data"""
@@ -80,7 +84,7 @@ churn_rate = merged_table['is_churned'].mean()
 print(f"Churn Rate: {churn_rate:.2%}")
 
 
-""" Model building """
+""" Logistic regression model building """
 
 # Define features  and target
 X = merged_table.drop(columns=['status', 'is_churned'])
@@ -114,8 +118,16 @@ y_proba_full = log_reg_model.predict_proba(X_full)[:, 1]
 
 results['churn_probability'] = y_proba_full
 
-# Define function to update results table in the database
-def update_results_table(results_df):
+def update_results_table(results_df: pd.DataFrame) -> None:
+    """
+       Update the results table with churn probabilities.
+
+       Args:
+           results_df (pd.DataFrame): The DataFrame containing the results to update.
+
+       Returns:
+           None
+       """
     try:
         with engine.connect() as connection:
             # Write to the database, updating existing rows

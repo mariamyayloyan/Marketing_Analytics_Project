@@ -6,11 +6,14 @@ from scipy.cluster.hierarchy import dendrogram, linkage
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+"""
+This module implements clustering techniques using K-Means and Hierarchical Clustering.
+"""
 
-# Prepare data for clustering
+""" Preparing data for clustering """
 X_clustering = X_full.copy()
 
-# K-Means Clustering
+""" K-Means Clustering """
 
 # Elbow Method
 inertia = []
@@ -35,6 +38,7 @@ cluster_labels_kmeans = kmeans.fit_predict(X_clustering)
 
 
 # Silhouette Score for K-Means
+
 silhouette_scores_kmeans = []
 for k in range(2, 11):
     kmeans = KMeans(n_clusters=k, random_state=42)
@@ -43,10 +47,11 @@ for k in range(2, 11):
     silhouette_scores_kmeans.append(score)
     print(f"K-Means Silhouette Score for k={k}: {score:.3f}")
 
+
 # Adding cluster labels to the DataFrame
 X_clustering['Cluster_KMeans'] = cluster_labels_kmeans
 
-# Visualizing K-Means Clusters using PCA
+""" Visualizing K-Means Clusters using PCA """
 pca = PCA(n_components=2)
 X_pca = pca.fit_transform(X_clustering.drop(columns=['Cluster_KMeans']))
 X_clustering_pca = pd.DataFrame(X_pca, columns=['PCA1', 'PCA2'])
@@ -61,7 +66,7 @@ plt.grid()
 plt.legend()
 plt.show()
 
-# Hierarchical Clustering
+""" Hierarchical Clustering """
 
 # Plotting the Dendrogram
 linked = linkage(X_clustering, method='ward')
@@ -74,14 +79,15 @@ plt.ylabel("Distance")
 plt.grid()
 plt.show()
 
-# Applying Agglomerative Clustering
+""" Applying Agglomerative Clustering """
+
 optimal_clusters_hierarchical = 4
 hierarchical_clustering = AgglomerativeClustering(n_clusters=optimal_clusters_hierarchical)
 cluster_labels_hierarchical = hierarchical_clustering.fit_predict(X_clustering)
 
 X_clustering['Cluster_Hierarchical'] = cluster_labels_hierarchical
 
-# Visualizing Hierarchical Clusters using PCA
+""" Visualizing Hierarchical Clusters using PCA """
 X_clustering_pca['Cluster_Hierarchical'] = cluster_labels_hierarchical
 
 plt.figure(figsize=(8, 5))
@@ -115,7 +121,16 @@ cluster_summary.to_csv('cluster_summary.csv', index=False)
 
 results['cluster_number'] = cluster_labels_kmeans
 
-def update_results_with_clusters(results_df):
+def update_results_with_clusters(results_df: pd.DataFrame) -> None:
+    """
+       Update the results table with cluster assignments.
+
+       Args:
+           results_df (pd.DataFrame): The DataFrame containing the results to update.
+
+       Returns:
+           None
+       """
     try:
         with engine.connect() as connection:
             results_df.to_sql('results', con=connection, if_exists='replace', index=False)
