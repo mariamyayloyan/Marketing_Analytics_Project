@@ -1,4 +1,4 @@
-## ML Models ##
+## ML Model ##
 
 ::: app_components.ds.final_model
 
