@@ -4,10 +4,11 @@ nav:
   - Home: index.md
   # - Presentation: index1.html
   - ETL: etl.md
+  - ML Model: ds.md
   - API: api.md
   - APP: app.md
   - API models: api_models.md
-  - ML Model: ds.md
+
 
 theme:
   name: material
