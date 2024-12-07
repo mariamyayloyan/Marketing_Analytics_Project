@@ -1,7 +1,7 @@
-##ML Models##
+## ML Models ##
 
 ::: app_components.ds.final_model
 
-##Clustering##
+## Clustering ##
 ::: app_components.ds.Clustering
 
