@@ -73,7 +73,7 @@ services:
     ports:
       - 8501:8501
     environment:
-      - API_URL=http://api:8000
+      - API_URL=http://back:8000
     depends_on:
       - back
 
