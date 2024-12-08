@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from typing import List, Optional
 from models import CustomerDB, PlanDB, ApplicationDB, SubscriptionDB, LocationDB, PriceDB, NotificationDB, ResultsDB  # Import database models # Import database models
 from schema import (
@@ -13,9 +14,16 @@ from schema import (
     Result, ResultCreate
 )
 from database import get_db
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="FastAPI for Subscription Management")
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins (or specify your Streamlit domain)
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all methods (GET, POST, etc.)
+    allow_headers=["*"],  # Allow all headers
+)
 # CRUD for Customer
 
 # GET Request - Retrieve a customer by ID
@@ -800,34 +808,156 @@ async def delete_result(result_id: int, db: Session = Depends(get_db)):
 # GET Request - Retrieve users filtered by churn probability or cluster number
 @app.get("/users/segmented/", response_model=List[Customer])
 async def get_users_by_segment(
-    churn_probability: Optional[float] = Query(None, ge=0.0, le=1.0),
+    #churn_probability: Optional[float] = Query(None, ge=0.0, le=1.0),
     cluster_number: Optional[int] = None,
     db: Session = Depends(get_db),
 ):
     """
-    Retrieve users filtered by churn probability or cluster number based on segmentation data.
+    Retrieve users filtered by churn probability or cluster number based on segmentation data, 
+    and return the percentage of customers in each segment.
 
-    **Parameters:**
+    Parameters:
     
-    - `churn_probability (float, optional):` A filter for churn probability (between 0.0 and 1.0).
-    - `cluster_number (int, optional):` A filter for the segmentation cluster number.
-    - `db (Session, optional):` Database session provided by dependency injection.
+    - churn_probability (float, optional): A filter for churn probability (between 0.0 and 1.0).
+    - cluster_number (int, optional): A filter for the segmentation cluster number.
+    - db (Session, optional): Database session provided by dependency injection.
 
-    **Returns:**
-        - `List[Customer]:` A list of customers that match the provided segmentation criteria.
+    Returns:
+        - List[Customer]: A list of customers that match the provided segmentation criteria, along with their segment percentage.
 
-    **Raises:**
-        - `HTTPException: 404` if no users match the filtering criteria.
+    Raises:
+        - HTTPException: 404 if no users match the filtering criteria.
     """
     query = db.query(CustomerDB).join(ResultsDB, CustomerDB.customer_id == ResultsDB.customer_id)
 
-    if churn_probability is not None:
-        query = query.filter(ResultsDB.churn_probability >= churn_probability)
+    #if churn_probability is not None:
+        #query = query.filter(ResultsDB.churn_probability >= churn_probability)
 
     if cluster_number is not None:
         query = query.filter(ResultsDB.cluster_number == cluster_number)
 
-    users = query.all()
-    if not users:
+    # Get total count of users matching the filter
+    total_users_count = query.count()
+
+    if total_users_count == 0:
         raise HTTPException(status_code=404, detail="No users found matching the criteria.")
-    return users
+
+    # Now get the actual list of users
+    users = query.all()
+
+    # Calculate the percentage of users in each segment
+    result = []
+    for user in users:
+        # Get the number of users in this specific segment (churn probability or cluster number)
+        ##if churn_probability is not None:
+            #segment_count = query.filter(ResultsDB.churn_probability >= churn_probability).count()
+        if cluster_number is not None:
+            segment_count = query.filter(ResultsDB.cluster_number == cluster_number).count()
+        else:
+            segment_count = total_users_count
+
+        percentage = (segment_count / total_users_count) * 100
+        
+        user_data = user.dict()  # Convert user to dictionary to add extra fields
+        user_data['segment_percentage'] = percentage
+        result.append(user_data)
+
+    return result
+
+
+@app.get("/customer/count_by_device/")
+async def count_customers_by_device(db: Session = Depends(get_db)):
+    """
+    Retrieve the number of customers for each device type.
+
+    Parameters:
+    - db (Session): Database session provided by dependency injection.
+
+    Returns:
+    - List[Dict]: A list of dictionaries, each representing a device type and the corresponding customer count.
+
+    Device Types:
+    - Tablet, Notebook, iPad, Smart TV, Phone
+    """
+    device_counts = (
+        db.query(SubscriptionDB.device_type, func.count(CustomerDB.customer_id))
+        .join(CustomerDB, CustomerDB.customer_id == SubscriptionDB.customer_id)
+        .group_by(SubscriptionDB.device_type)
+        .all()
+    )
+
+    # Convert the results into a structured format
+    results = [{"device_type": device, "customer_count": count} for device, count in device_counts]
+    return results
+
+
+@app.get("/customer/count_by_city/")
+async def count_customers_by_city(db: Session = Depends(get_db)):
+    """
+    Retrieve the number of customers in each city.
+
+    Parameters:
+    - db (Session): Database session provided by dependency injection.
+
+    Returns:
+    - List[Dict]: A list of dictionaries, each representing a city and the corresponding customer count.
+
+    Raises:
+    - HTTPException: 404 if no customers are found.
+    """
+    # Query to count customers by city
+    city_counts = (
+        db.query(CustomerDB.location, func.count(CustomerDB.customer_id))
+        .group_by(CustomerDB.location)
+        .all()
+    )
+
+    if not city_counts:
+        raise HTTPException(status_code=404, detail="No customers found in any city.")
+
+    # Format the results
+    results = [{"city": city, "customer_count": count} for city, count in city_counts]
+    return results
+
+@app.get("/customer/count_by_age_group/")
+async def count_customers_by_age_group(db: Session = Depends(get_db)):
+    """
+    Retrieve the number of customers in predefined age groups: 0-20, 20-30, 30-40, and 40+.
+
+    Parameters:
+    - db (Session): Database session provided by dependency injection.
+
+    Returns:
+    - List[Dict]: A list of dictionaries, each representing an age group and the corresponding customer count.
+
+    Raises:
+    - HTTPException: 404 if no customers are found.
+    """
+    # Define the age groups
+    age_groups = [
+        {"label": "0-20", "min_age": 0, "max_age": 20},
+        {"label": "20-30", "min_age": 20, "max_age": 30},
+        {"label": "30-40", "min_age": 30, "max_age": 40},
+        {"label": "40+", "min_age": 40, "max_age": None},  # No upper limit
+    ]
+
+    results = []
+
+    # Calculate customer count for each age group
+    for group in age_groups:
+        if group["max_age"] is None:
+            # Handle "40+" group
+            count = db.query(CustomerDB).filter(CustomerDB.age >= group["min_age"]).count()
+        else:
+            count = db.query(CustomerDB).filter(
+                CustomerDB.age >= group["min_age"],
+                CustomerDB.age < group["max_age"]
+            ).count()
+
+        results.append({"age_group": group["label"], "customer_count": count})
+
+    # Check if results are empty
+    if not results:
+        raise HTTPException(status_code=404, detail="No customers found in any age group.")
+
+    return results
