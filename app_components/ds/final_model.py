@@ -4,7 +4,7 @@ import sqlalchemy
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import LogisticRegression
-from app_components.etl.Database.database import *
+from app_components.etl.Database.database import engine
 
 """
 This module builds a logistic regression model for churn prediction and updates the database.
@@ -41,9 +41,10 @@ notification = fetch_table_as_dataframe("notification")
 subscription = fetch_table_as_dataframe("subscription")
 results = fetch_table_as_dataframe("results")
 
+
 """Merging tables"""
 merged_table = customer.merge(subscription, on='customer_id', how='inner')
-merged_table = merged_table.merge(application, left_on='application_id', right_on='app_id', how='inner')
+merged_table = merged_table.merge(application, on='application_id',  how='inner')
 merged_table = merged_table.merge(location, on='location_id', how='inner')
 merged_table = merged_table.merge(price, left_on='price_id', right_on='id', how='inner')
 merged_table = merged_table.merge(notification, on='notification_id', how='inner')
@@ -142,4 +143,3 @@ update_results_table(results)
 
 updated_results = fetch_table_as_dataframe("results")
 print(updated_results.head())
-
