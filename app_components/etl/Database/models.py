@@ -1,8 +1,10 @@
 from sqlalchemy import Column, Integer, Float, Date, String, ForeignKey, DECIMAL
 from sqlalchemy.orm import declarative_base, relationship
-from Database.database import Base, engine
+from app_components.etl.Database.database import Base, engine
 
 Base = declarative_base()
+Base.metadata.drop_all(engine)
+Base.metadata.create_all(engine)
 
 
 class Location(Base):
@@ -21,7 +23,7 @@ class Location(Base):
     subscriptions = relationship("Subscription", back_populates="location")
 
 
-class Customer(Base):
+class customer(Base):
     """
     Represents a customer.
 
@@ -188,5 +190,3 @@ class Results(Base):
     churn_probability = Column(DECIMAL(5, 2))
     cluster_number = Column(Integer)
 
-
-Base.metadata.create_all(engine)
