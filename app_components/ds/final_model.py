@@ -44,7 +44,7 @@ results = fetch_table_as_dataframe("results")
 
 """Merging tables"""
 merged_table = customer.merge(subscription, on='customer_id', how='inner')
-merged_table = merged_table.merge(application, on='application_id',  how='inner')
+merged_table = merged_table.merge(application, left_on='application_id', right_on='app_id',  how='inner')
 merged_table = merged_table.merge(location, on='location_id', how='inner')
 merged_table = merged_table.merge(price, left_on='price_id', right_on='id', how='inner')
 merged_table = merged_table.merge(notification, on='notification_id', how='inner')
