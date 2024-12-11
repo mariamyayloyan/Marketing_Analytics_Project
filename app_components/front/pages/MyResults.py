@@ -1,5 +1,5 @@
 import streamlit as st
-import matplotlib.pyplot as plt
+import requests
 
 
 def set_page_background():
@@ -7,18 +7,18 @@ def set_page_background():
         """
         <style>
         body {
-            background-color: #001f3f;;
+            background-color: #001f3f;
             color: white;
         }
         .stApp {
-            background-color: #001f3f;; 
+            background-color: #001f3f; 
             color: white;
         }
         h1, h2, h3, h4, h5, h6 {
             color: #FFFFFF; 
         }
         .sidebar .sidebar-content {
-            background-color: #001f3f;; 
+            background-color: #001f3f; 
         }
         .stButton>button {
             background-color: #003366;
@@ -30,68 +30,101 @@ def set_page_background():
     )
 
 
-AGE_GROUP_DATA = {
-    "Age Group": ["Under 20", "20+", "30+", "40+"],
-    "Percentage": [45, 50, 40, 35]
-}
-
-DEVICE_DATA = {
-    "Device": ["Android", "iOS", "Windows", "Linux"],
-    "Percentage": [50, 30, 15, 5]
-}
-
-COUNTRY_DATA = {
-    "Country": ["USA", "Canada", "UK", "Germany"],
-    "Percentage": [40, 30, 20, 10]
-}
+AGE_GROUP_URL = "http://back:8000/customer/count_by_age_group/"
+DEVICE_URL = "http://back:8000/customer/count_by_device/"
+COUNTRY_URL = "http://back:8000/customer/count_by_city/"
 
 
+# Function to fetch data from FastAPI endpoints
+def fetch_data(url):
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            data = response.json()  # Parse the JSON response into a Python object
+            return data
+        else:
+            st.error(f"Failed to fetch data: {response.status_code}")
+            return []
+    except Exception as e:
+        st.error(f"Error fetching data: {e}")
+        return []
+
+
+# Function to display results
 def my_results_page():
     set_page_background()
     st.title("My Results")
 
+    # Fetch data from FastAPI endpoints
+    age_group_data = fetch_data(AGE_GROUP_URL)
+    device_data = fetch_data(DEVICE_URL)
+    country_data = fetch_data(COUNTRY_URL)
+
+    # Create three columns for the layout
     col1, col2, col3 = st.columns(3)
 
     # 1. Age Group Segment
     with col1:
         st.subheader("Age Groups")
-        fig, ax = plt.subplots()
-        ax.bar(AGE_GROUP_DATA["Age Group"], AGE_GROUP_DATA["Percentage"], color="skyblue")
-        ax.set_title("Age Group Distribution")
-        ax.set_ylabel("Distribution (%)")
-        st.pyplot(fig)
+        if age_group_data:
+            # Prepare data for Streamlit's bar chart
+            import pandas as pd
 
-        if st.button("Details: Age Groups"):
-            with st.expander("Age Group Details"):
-                for i, age_group in enumerate(AGE_GROUP_DATA["Age Group"]):
-                    st.write(f"**{age_group}**: {AGE_GROUP_DATA['Percentage'][i]}% of users")
+            # Convert the data into a DataFrame
+            age_group_df = pd.DataFrame(age_group_data)
+
+            # Use Streamlit's bar_chart to visualize the data
+            st.bar_chart(
+                age_group_df.set_index("age_group")["customer_count"],
+                use_container_width=True
+            )
+
+            if st.button("Details: Age Groups"):
+                with st.expander("Age Group Details"):
+                    for item in age_group_data:
+                        st.write(f"{item['age_group']}: {item['customer_count']} customers")
 
     # 2. Device Segment
     with col2:
         st.subheader("Devices")
-        fig, ax = plt.subplots()
-        ax.pie(DEVICE_DATA["Percentage"], labels=DEVICE_DATA["Device"], autopct='%1.1f%%', colors=["blue", "green", "lightblue", "lightgreen"])
-        ax.set_title("Device Distribution")
-        st.pyplot(fig)
+        if device_data:
+            total = sum(item['customer_count'] for item in device_data)
 
-        if st.button("Details: Devices"):
-            with st.expander("Device Details"):
-                for i, device in enumerate(DEVICE_DATA["Device"]):
-                    st.write(f"**{device}**: {DEVICE_DATA['Percentage'][i]}% of users")
+            st.write("### Device Distribution")
+            for item in device_data:
+                percentage = (item['customer_count'] / total) * 100
+                st.write(f"**{item['device_type']}**")
+                st.progress(int(percentage))
 
-    # 3. Country Segment
-    with col3:
-        st.subheader("Countries")
-        fig, ax = plt.subplots()
-        ax.bar(COUNTRY_DATA["Country"], COUNTRY_DATA["Percentage"], color="lightgreen")
-        ax.set_title("Top 4 Countries")
-        ax.set_ylabel("Percentage of Users")
-        st.pyplot(fig)
+            if st.button("Details: Devices"):
+                with st.expander("Device Details"):
+                    for item in device_data:
+                        st.write(
+                            f"{item['device_type']}: {item['customer_count']} customers ({(item['customer_count'] / total) * 100:.1f}%)")
 
-        if st.button("Details: Countries"):
-            with st.expander("Country Details"):
-                for i, country in enumerate(COUNTRY_DATA["Country"]):
-                    st.write(f"**{country}**: {COUNTRY_DATA['Percentage'][i]}% of users")
+        # 3. Country Segment
+        with col3:
+            st.subheader("Cities")
+            if country_data:
+                import pandas as pd
+
+                # Convert the data into a DataFrame
+                city_df = pd.DataFrame(country_data)
+
+                # Sort the DataFrame by 'customer_count' in descending order and select the top 5 cities
+                top_cities_df = city_df.sort_values(by="customer_count", ascending=False).head(5)
+
+                # Create a bar chart using Streamlit for the top 5 cities
+                st.bar_chart(
+                    top_cities_df.set_index("city")["customer_count"],
+                    use_container_width=True
+                )
+
+                if st.button("Details: Cities"):
+                    with st.expander("City Details"):
+                        for item in top_cities_df.to_dict(orient="records"):
+                            st.write(f"{item['city']}: {item['customer_count']} customers")
+
 
 
 my_results_page()
