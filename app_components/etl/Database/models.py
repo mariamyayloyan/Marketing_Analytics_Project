@@ -1,13 +1,19 @@
 from sqlalchemy import Column, Integer, Float, Date, String, ForeignKey, DECIMAL
 from sqlalchemy.orm import declarative_base, relationship
-import sqlalchemy.exc
 from Database.database import Base, engine
-
 
 Base = declarative_base()
 
 
 class Location(Base):
+    """
+    Represents a location with an area name.
+
+    Attributes:
+        location_id (int): Primary key.
+        area_name (str): Unique name of the area.
+        subscriptions (list): relationship with subscriptions.
+    """
     __tablename__ = "location"
     location_id = Column(Integer, primary_key=True, index=True)
     area_name = Column(String, unique=True)
@@ -16,6 +22,20 @@ class Location(Base):
 
 
 class Customer(Base):
+    """
+    Represents a customer.
+
+    Attributes:
+        customer_id (int): Primary key.
+        first_name (str): First name of the customer.
+        last_name (str): Last name of the customer.
+        gender (str): Gender of the customer.
+        birth_date (date): Date of birth.
+        age (int): Age of the customer.
+        location_id (int): Foreign key to location.
+        email (str): Unique email address.
+        subscriptions (list):  relationship with subscriptions.
+    """
     __tablename__ = "customer"
     customer_id = Column(Integer, primary_key=True, index=True)
     first_name = Column(String)
@@ -30,6 +50,15 @@ class Customer(Base):
 
 
 class Plan(Base):
+    """
+    Represents a subscription plan.
+
+    Attributes:
+        plan_id (int): Primary key.
+        plan_type (str): Type of the plan.
+        prices (list): Associated prices for the plan.
+        subscriptions (list):  relationship with subscriptions.
+    """
     __tablename__ = "plan"
     plan_id = Column(Integer, primary_key=True, index=True)
     plan_type = Column(String, index=True)
@@ -39,6 +68,15 @@ class Plan(Base):
 
 
 class Application(Base):
+    """
+    Represents an application.
+
+    Attributes:
+        application_id (int): Primary key.
+        application_name (str): Name of the application.
+        prices (list): Associated prices for the application.
+        subscriptions (list): relationship with subscriptions.
+    """
     __tablename__ = "application"
     application_id = Column(Integer, primary_key=True, index=True)
     application_name = Column(String, index=True)
@@ -48,6 +86,18 @@ class Application(Base):
 
 
 class Price(Base):
+    """
+    Represents a pricing model.
+
+    Attributes:
+        price_id (int): Primary key.
+        application_id (int): Foreign key to application.
+        plan_id (int): Foreign key to plan.
+        price (decimal): Price value.
+        application (Application): Associated application.
+        plan (Plan): Associated plan.
+        subscriptions (list):  relationship with subscriptions.
+    """
     __tablename__ = "price"
     price_id = Column(Integer, primary_key=True, index=True)
     application_id = Column(Integer, ForeignKey("application.application_id"), nullable=False)
@@ -60,6 +110,14 @@ class Price(Base):
 
 
 class Notification(Base):
+    """
+    Represents a notification type.
+
+    Attributes:
+        notification_id (int): Primary key.
+        notification_type (str): Type of notification.
+        subscriptions (list):  relationship with subscriptions.
+    """
     __tablename__ = "notification"
     notification_id = Column(Integer, primary_key=True, index=True)
     notification_type = Column(String)
@@ -68,6 +126,30 @@ class Notification(Base):
 
 
 class Subscription(Base):
+    """
+    Represents a subscription for a customer.
+
+    Attributes:
+        id (int): Primary key.
+        customer_id (int): Foreign key to customer.
+        location_id (int): Foreign key to location.
+        application_id (int): Foreign key to application.
+        plan_id (int): Foreign key to plan.
+        price_id (int): Foreign key to price.
+        notification_id (int): Foreign key to notification.
+        start_date (date): Start date of the subscription.
+        status (str): Subscription status.
+        end_date (date): End date of the subscription.
+        duration (decimal): Duration of the subscription.
+        device_type (str): Type of device used.
+
+        customer (Customer):  relationship with customer.
+        location (Location): relationship with location..
+        application (Application):  relationship with application.
+        plan (Plan):  relationship with plan.
+        price (Price):  relationship with price.
+        notification (Notification):  relationship with notification.
+    """
     __tablename__ = "subscription"
     id = Column(Integer, primary_key=True, index=True)
     customer_id = Column(Integer, ForeignKey("customer.customer_id"), nullable=False)
@@ -89,11 +171,22 @@ class Subscription(Base):
     price = relationship("Price", back_populates="subscriptions")
     notification = relationship("Notification", back_populates="subscriptions")
 
+
 class Results(Base):
+    """
+    Represents results for analysis.
+
+    Attributes:
+        id (int): Primary key.
+        customer_id (int): Foreign key to customer.
+        churn_probability (decimal): Probability of churn.
+        cluster_number (int): Cluster number.
+    """
     __tablename__ = "results"
     id = Column(Integer, primary_key=True, index=True)
     customer_id = Column(Integer, ForeignKey("customer.customer_id"), nullable=False)
     churn_probability = Column(DECIMAL(5, 2))
     cluster_number = Column(Integer)
+
 
 Base.metadata.create_all(engine)
