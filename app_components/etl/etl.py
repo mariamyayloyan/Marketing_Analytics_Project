@@ -7,6 +7,7 @@ import glob
 from os import path
 import os
 
+
 """ Configure logging """
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

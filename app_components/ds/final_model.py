@@ -6,9 +6,11 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import LogisticRegression
 from app_components.etl.Database.database import engine
 
+
 """
 This module builds a logistic regression model for churn prediction and updates the database.
 """
+
 
 """ Fetching data from database """
 

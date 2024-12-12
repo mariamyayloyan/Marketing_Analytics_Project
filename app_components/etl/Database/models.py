@@ -155,7 +155,6 @@ class Subscription(Base):
     price = relationship("Price", back_populates="subscriptions")
     notification = relationship("Notification", back_populates="subscriptions")
 
-
 class Results(Base):
     """
     Represents analysis results for customer churn.
