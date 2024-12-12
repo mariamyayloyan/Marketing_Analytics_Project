@@ -4,8 +4,13 @@ import sqlalchemy
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import LogisticRegression
-from app_components.etl.Database.database import engine
+import sys
+import os
 
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+sys.path.append(project_root)
+
+from app_components.etl.Database.database import engine
 
 """
 This module builds a logistic regression model for churn prediction and updates the database.

@@ -1,5 +1,5 @@
 from Database.models import *
-from Database.database import engine, Base
+import Database.database
 from sqlalchemy import create_engine, text, inspect
 import pandas as pd
 import logging

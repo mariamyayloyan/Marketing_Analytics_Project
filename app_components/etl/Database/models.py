@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, Float, Date, String, ForeignKey, DECIMAL
 from sqlalchemy.orm import declarative_base, relationship
-from app_components.etl.Database.database import Base, engine
+from Database.database import Base, engine
 
 Base = declarative_base()
 Base.metadata.drop_all(engine)
