@@ -31,7 +31,6 @@ def fetch_table_as_dataframe(table_name: str) -> pd.DataFrame:
         return df
 
 
-
 customer = fetch_table_as_dataframe("customer")
 location = fetch_table_as_dataframe("location")
 plan = fetch_table_as_dataframe("plan")
@@ -49,6 +48,7 @@ merged_table = merged_table.merge(location, on='location_id', how='inner')
 merged_table = merged_table.merge(price, left_on='price_id', right_on='id', how='inner')
 merged_table = merged_table.merge(notification, on='notification_id', how='inner')
 merged_table = merged_table.merge(plan, left_on='plan_type_id', right_on='plan_id', how='inner')
+
 
 
 
