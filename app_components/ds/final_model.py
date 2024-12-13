@@ -4,22 +4,28 @@ import sqlalchemy
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import LogisticRegression
+from dotenv import load_dotenv
+
 import sys
 import os
 
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
-sys.path.append(project_root)
+# Add the parent directory of `app_components` to sys.path
+current_dir = os.path.dirname(os.path.abspath(__file__))  # Path to `app_components/ds`
+project_root = os.path.abspath(os.path.join(current_dir, ".."))  # Path to `app_components`
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
 
-from app_components.etl.Database.database import engine
-
-"""
-This module builds a logistic regression model for churn prediction and updates the database.
-"""
+from etl.Database.database import *
 
 
-""" Fetching data from database """
 
-def fetch_table_as_dataframe(table_name: str) -> pd.DataFrame:
+load_dotenv(".env")
+
+DATABASE_URL = os.environ.get("DATABASE_URL")
+
+engine = create_engine(DATABASE_URL)
+
+def fetch_table_as_dataframe(table_name):
     """
     Fetch data from a specific database table and return it as a Pandas DataFrame.
 
@@ -38,6 +44,7 @@ def fetch_table_as_dataframe(table_name: str) -> pd.DataFrame:
         return df
 
 
+
 customer = fetch_table_as_dataframe("customer")
 location = fetch_table_as_dataframe("location")
 plan = fetch_table_as_dataframe("plan")
@@ -47,16 +54,15 @@ notification = fetch_table_as_dataframe("notification")
 subscription = fetch_table_as_dataframe("subscription")
 results = fetch_table_as_dataframe("results")
 
-
 """Merging tables"""
 merged_table = customer.merge(subscription, on='customer_id', how='inner')
-merged_table = merged_table.merge(application, left_on='application_id', right_on='app_id',  how='inner')
+merged_table = merged_table.merge(application, left_on='application_id', right_on='app_id', how='inner')
 merged_table = merged_table.merge(location, on='location_id', how='inner')
 merged_table = merged_table.merge(price, left_on='price_id', right_on='id', how='inner')
 merged_table = merged_table.merge(notification, on='notification_id', how='inner')
 merged_table = merged_table.merge(plan, left_on='plan_type_id', right_on='plan_id', how='inner')
-
-
+#merged_table = merged_table.merge(results, on='customer_id', how='inner')
+#print(merged_table.head())
 
 
 """ Cleaning  and labeling data"""
@@ -92,7 +98,7 @@ churn_rate = merged_table['is_churned'].mean()
 print(f"Churn Rate: {churn_rate:.2%}")
 
 
-""" Logistic regression model building """
+""" Model building """
 
 # Define features  and target
 X = merged_table.drop(columns=['status', 'is_churned'])
@@ -126,16 +132,8 @@ y_proba_full = log_reg_model.predict_proba(X_full)[:, 1]
 
 results['churn_probability'] = y_proba_full
 
-def update_results_table(results_df: pd.DataFrame) -> None:
-    """
-       Update the results table with churn probabilities.
-
-       Args:
-           results_df (pd.DataFrame): The DataFrame containing the results to update.
-
-       Returns:
-           None
-       """
+# Define function to update results table in the database
+def update_results_table(results_df):
     try:
         with engine.connect() as connection:
             # Write to the database, updating existing rows
@@ -150,3 +148,4 @@ update_results_table(results)
 
 updated_results = fetch_table_as_dataframe("results")
 print(updated_results.head())
+
