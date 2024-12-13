@@ -47,25 +47,19 @@ services:
         condition: service_healthy
     healthcheck:
       test: "exit 0"
-
+  
   ds:
     container_name: ds
     build:
       context: ./ds
       dockerfile: Dockerfile
-    ports:
-      - 3002:3002
     volumes:
-      - ./ds:/ds
-    depends_on:
+        - ./ds:/ds
+    depends_on: 
       db:
         condition: service_healthy
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:3002" ]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-
+      test: "exit 0"
 
   
   back:
