@@ -961,3 +961,94 @@ async def count_customers_by_age_group(db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="No customers found in any age group.")
 
     return results
+
+
+@app.get("/user_categories/")
+async def get_user_categories(db: Session = Depends(get_db)):
+    """
+    Retrieve user segmentation data with cluster names and percentages.
+
+    **Returns:**
+        - A list of dictionaries containing user categories and their percentages.
+    """
+    # Query counts for each cluster
+    segments = (
+        db.query(
+            ResultsDB.cluster_number,
+            func.count(ResultsDB.id).label("customer_count")
+        )
+        .group_by(ResultsDB.cluster_number)
+        .all()
+    )
+
+    # Cluster-to-category mapping
+    cluster_mapping = {
+        0: "Canceled Users",
+        1: "Loyal Users",
+        2: "Engaged Users",
+        3: "High-Risk Users",
+    }
+
+    # Build response data
+    response_data = []
+    total_customers = sum(segment.customer_count for segment in segments)
+
+    for segment in segments:
+        cluster_number = segment.cluster_number
+        user_count = segment.customer_count
+        percentage = (user_count / total_customers) * 100
+
+        if cluster_number in cluster_mapping:
+            response_data.append({
+                "Category": cluster_mapping[cluster_number],
+                "Percentage": round(percentage, 2)
+            })
+
+    return response_data
+
+
+@app.get("/user_churn_categories/")
+async def get_user_churn_categories(db: Session = Depends(get_db)):
+    """
+    Calculate the percentage of users in each churn category based on churn probability.
+
+    **Returns:**
+        - A list of dictionaries containing churn categories and their percentages.
+    """
+    # Query total users to calculate percentages
+    total_users = db.query(func.count(ResultsDB.id)).scalar()
+
+    if total_users == 0:
+        return {"message": "No users found in the database."}
+
+    # Churn categories and their ranges
+    churn_categories = {
+        "Loyal Users": (-1, 0.445),
+        "Engaged Users": (0.45, 0.65),
+        "High-Risk Users": (0.65, 0.8),
+        "Dormant Users": (0.8, 1.0),
+    }
+
+    response_data = []
+
+    for category, (lower_bound, upper_bound) in churn_categories.items():
+        # Count users in each category
+        user_count = (
+            db.query(func.count(ResultsDB.id))
+            .filter(
+                ResultsDB.churn_probability > lower_bound,
+                ResultsDB.churn_probability <= upper_bound
+            )
+            .scalar()
+        )
+
+        # Calculate percentage
+        percentage = (user_count / total_users) * 100
+
+        # Append category data
+        response_data.append({
+            "Category": category,
+            "Percentage": round(percentage, 2)
+        })
+
+    return response_data
