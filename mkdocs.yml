@@ -4,11 +4,9 @@ nav:
   - Home: index.md
   # - Presentation: index1.html
   - ETL: etl.md
-  - ML Model: ds.md
   - API: api.md
   - APP: app.md
   - API models: api_models.md
-
 
 theme:
   name: material
@@ -47,4 +45,3 @@ plugins:
 
           rendering:
             show_source: true
-
