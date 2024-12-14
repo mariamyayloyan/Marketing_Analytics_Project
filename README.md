@@ -103,7 +103,22 @@ An interface for managing the PostgreSQL database.
   
 ## Swagger screenshots
 
+![localhost_8008_docs](https://github.com/user-attachments/assets/7dc2d85c-9d1c-429b-9d66-a124c5775abc)
+
 ## UI screenshots
+
+![localhost_8501_ (1)](https://github.com/user-attachments/assets/6f886766-1769-4ba7-a2a9-b1d90477da0e)
+
+![localhost_8501_](https://github.com/user-attachments/assets/19ac3440-5b04-4f15-9281-67c9ce8d20a0)
+
+![image](https://github.com/user-attachments/assets/1e2ea397-2f90-43d4-b06d-327b0c5cc5d9)
+
+![image](https://github.com/user-attachments/assets/ee962b3f-ebab-47b1-8050-69e0135f860b)
+
+![image](https://github.com/user-attachments/assets/d1051085-cbe8-42fc-9fed-7af7aec242ae)
+
+![image](https://github.com/user-attachments/assets/4db81487-cf12-46a6-9da0-e8e0071fd107)
+
 
 
 ## Other links:
