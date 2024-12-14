@@ -13,3 +13,6 @@ This section describes the clustering techniques used in `Clustering.py`.
 Implemented: K-means and Hierarchical Clustering
 
 ::: app_components.ds.Clustering
+
+::: app_components.ds.models
+
