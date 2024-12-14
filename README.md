@@ -117,7 +117,7 @@ An interface for managing the PostgreSQL database.
 
 ![image](https://github.com/user-attachments/assets/d1051085-cbe8-42fc-9fed-7af7aec242ae)
 
-![image](https://github.com/user-attachments/assets/4db81487-cf12-46a6-9da0-e8e0071fd107)
+![image](https://github.com/user-attachments/assets/f8ce29c5-8bbc-4cd5-ae91-14456eac36f1)
 
 
 
