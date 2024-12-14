@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 
-# Function to set the page background
+
 def set_page_background():
     st.markdown(
         """
@@ -24,10 +24,24 @@ def set_page_background():
             background-color: #003366;
             color: white;
         }
+        .stMetric {
+            color: white !important;
+            font-family: Arial, sans-serif;
+        }
+        .stMetric h3 {
+            font-size: 18px; /* Smaller title font size */
+            margin-bottom: 0;
+        }
+        .stMetric p {
+            font-size: 20px; /* Smaller percentage font size */
+            font-weight: bold;
+            margin-top: 0;
+        }
         </style>
         """,
         unsafe_allow_html=True
     )
+
 
 # Static email contexts for each category
 EMAIL_CONTEXTS = {
@@ -45,7 +59,7 @@ EMAIL_CONTEXTS = {
     },
 }
 
-# Function to fetch data from FastAPI
+
 def fetch_user_categories():
     try:
         response = requests.get("http://back:8000/user_churn_categories/")
@@ -57,6 +71,7 @@ def fetch_user_categories():
     except Exception as e:
         st.error(f"Error fetching data: {e}")
         return []
+
 
 # Display Solutions Page
 def solutions_page():
@@ -75,7 +90,15 @@ def solutions_page():
             st.subheader(category_name)
 
             # Display percentage with a progress bar
-            st.metric(label="Percentage", value=f"{percentage}%")
+            st.markdown(
+                f"""
+                <div class="stMetric">
+                    <h3>Percentage</h3>
+                    <p>{percentage}%</p>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
             st.progress(percentage / 100)
 
             # Display email context in an expandable section
@@ -83,5 +106,5 @@ def solutions_page():
                 with st.expander(f"Details: {category_name}"):
                     st.write(f"**Email Context:** {EMAIL_CONTEXTS[category_name]['Email Context']}")
 
-# Run the Streamlit app
+
 solutions_page()
