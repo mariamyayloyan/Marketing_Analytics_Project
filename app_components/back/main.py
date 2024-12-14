@@ -1023,7 +1023,7 @@ async def get_user_churn_categories(db: Session = Depends(get_db)):
 
     # Churn categories and their ranges
     churn_categories = {
-        "Loyal Users": (-1, 0.445),
+        "Loyal Users": (-1, 0.45),
         "Engaged Users": (0.45, 0.65),
         "High-Risk Users": (0.65, 0.8),
         "Dormant Users": (0.8, 1.0),
