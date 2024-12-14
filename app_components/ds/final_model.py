@@ -6,14 +6,6 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import LogisticRegression
 from dotenv import load_dotenv
 
-import sys
-import os
-
-# Add the parent directory of `app_components` to sys.path
-current_dir = os.path.dirname(os.path.abspath(__file__))  # Path to `app_components/ds`
-project_root = os.path.abspath(os.path.join(current_dir, ".."))  # Path to `app_components`
-if project_root not in sys.path:
-    sys.path.insert(0, project_root)
 
 from database import *
 
