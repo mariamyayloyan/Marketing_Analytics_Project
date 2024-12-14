@@ -8,12 +8,39 @@ from os import path
 import os 
 
 # Configure logging
+""" Configure logging """
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 logging.basicConfig()
 
+def drop_all_foreign_keys():
+    """
+    Drops all foreign key constraints in the database schema.
+    Logs any failures.
+    """
+    try:
+        with engine.connect() as connection:
+            inspector = inspect(engine)
+            for table_name in inspector.get_table_names():
+                for fk in inspector.get_foreign_keys(table_name):
+                    fk_name = fk.get('name')
+                    if fk_name:
+                        connection.execute(text(f"ALTER TABLE {table_name} DROP CONSTRAINT IF EXISTS {fk_name} CASCADE"))
+                        logger.info(f"Successfully dropped foreign key {fk_name} on table {table_name}")
+    except Exception as e:
+        logger.error(f"Failed to drop foreign keys: {e}")
 
 def drop_table_with_cascade(table_name):
+    """
+    Drops a specified table with CASCADE option.
+
+    Args:
+        table_name (str): Name of the table to drop.
+
+    Logs:
+        - Success message if the table is dropped.
+        - Error message if the operation fails.
+    """
     try:
         with engine.connect() as connection:
             connection.execute(text(f"DROP TABLE IF EXISTS {table_name} CASCADE"))
@@ -23,6 +50,17 @@ def drop_table_with_cascade(table_name):
 
 
 def load_csv_to_table(table_name, csv_path):
+    """
+    Loads data from a CSV file into a specified database table.
+
+    Args:
+        table_name (str): Name of the target table.
+        csv_path (str): Path to the CSV file.
+
+    Logs:
+        - Success message if data is loaded successfully.
+        - Error message if loading or parsing fails.
+    """
     try:
         df = pd.read_csv(csv_path)
         df.to_sql(table_name, con=engine, if_exists="replace", index=False)
@@ -34,6 +72,16 @@ def load_csv_to_table(table_name, csv_path):
 
 
 def validate_table_schema(table_name):
+    """
+    Validates and logs the schema of a specified table.
+
+    Args:
+        table_name (str): Name of the table to validate.
+
+    Logs:
+        - Table schema if validation succeeds.
+        - Error message if validation fails.
+    """
     inspector = inspect(engine)
     try:
         columns = inspector.get_columns(table_name)
