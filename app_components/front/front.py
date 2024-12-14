@@ -500,50 +500,74 @@ st.markdown(
 )
 
 
+# def pricing_page():
+#     set_page_background()
+#     """
+#     Renders the 'Pricing Plans' page, showcasing different subscription tiers for Loyalytics with their respective features.
+
+#     This page displays three pricing options available for customers: 'One Data', 'One Data', and 'Enterprise'. Each tier has a
+#     specific pricing, timeline for service delivery, and associated features. The pricing structure is designed to cater to
+#     different customer needs, from basic data insights to advanced analytics and security features.
+#     """
+
+#     """
+
+#     Pricing Tiers:
+#         - **One Data ($99)**:
+#             - Provide a dataset
+#             - Wait 14 business days for insights
+#             - Get basic data insights and strategy suggestions
+#             - Call to action: "Start and Think"
+
+#         - **One Data ($299)** (Best Deal):
+#             - Provide a dataset
+#             - Wait 7 business days for insights
+#             - Get data insights and numerous prompts for customer retention strategies
+#             - Call to action: "Get Prompts"
+
+#         - **Enterprise ($499)**:
+#             - Provide a dataset
+#             - Wait 3 business days for insights
+#             - Get advanced analytics, enhanced security, and applied retention strategies
+#             - Call to action: "Loyal Customers"
+
+#     Purpose:
+#         - Helps potential customers understand the available pricing plans.
+#         - Provides clear and actionable steps based on the selected plan.
+#         - Highlights the most popular and cost-effective plan using a label or badge (#bestdeal).
+
+#     User Flow:
+#         - The user can easily navigate between different pricing options and click on buttons to proceed with the respective service.
+#         - Each plan is presented with its price, description, and a call-to-action button.
+
+#     Styling:
+#         - The page layout follows a card-style design with distinct blocks for each plan.
+#         - A prominent #bestdeal label is used for the mid-tier option to attract attention.
+#         - The call-to-action buttons are styled in a consistent color scheme to encourage user engagement.
+
+#     """
+#     # Page content goes here (using Streamlit components like st.markdown, st.write, etc. to structure the page)
+#     st.markdown("<h1>Pricing Plans</h1>", unsafe_allow_html=True)
+
+
 def pricing_page():
+    """
+    Renders the Pricing Plans page.
+
+    The Pricing Plans page showcases three subscription options for customers, each tailored to different business needs. 
+    Each pricing plan includes its description, associated features, and a call-to-action button.
+
+    **Pricing Tiers**:
+    - **One Data ($99)**: Basic data insights with a 14-day turnaround.
+    - **One Data ($299)**: Solution prompts and data insights within 7 days (#BestDeal).
+    - **Enterprise ($499)**: Advanced analytics, security, and applied retention strategies within 3 days.
+
+    **Features**:
+    - Pricing tiers are displayed in a card-style layout for easy comparison.
+    - The "Best Deal" tier is highlighted to attract attention.
+    - Interactive call-to-action buttons are styled for better user engagement.
+    """
     set_page_background()
-    """
-    Renders the 'Pricing Plans' page, showcasing different subscription tiers for Loyalytics with their respective features.
-
-    This page displays three pricing options available for customers: 'One Data', 'One Data', and 'Enterprise'. Each tier has a
-    specific pricing, timeline for service delivery, and associated features. The pricing structure is designed to cater to
-    different customer needs, from basic data insights to advanced analytics and security features.
-
-    Pricing Tiers:
-        - **One Data ($99)**:
-            - Provide a dataset
-            - Wait 14 business days for insights
-            - Get basic data insights and strategy suggestions
-            - Call to action: "Start and Think"
-
-        - **One Data ($299)** (Best Deal):
-            - Provide a dataset
-            - Wait 7 business days for insights
-            - Get data insights and numerous prompts for customer retention strategies
-            - Call to action: "Get Prompts"
-
-        - **Enterprise ($499)**:
-            - Provide a dataset
-            - Wait 3 business days for insights
-            - Get advanced analytics, enhanced security, and applied retention strategies
-            - Call to action: "Loyal Customers"
-
-    Purpose:
-        - Helps potential customers understand the available pricing plans.
-        - Provides clear and actionable steps based on the selected plan.
-        - Highlights the most popular and cost-effective plan using a label or badge (#bestdeal).
-
-    User Flow:
-        - The user can easily navigate between different pricing options and click on buttons to proceed with the respective service.
-        - Each plan is presented with its price, description, and a call-to-action button.
-
-    Styling:
-        - The page layout follows a card-style design with distinct blocks for each plan.
-        - A prominent #bestdeal label is used for the mid-tier option to attract attention.
-        - The call-to-action buttons are styled in a consistent color scheme to encourage user engagement.
-
-    """
-    # Page content goes here (using Streamlit components like st.markdown, st.write, etc. to structure the page)
     st.markdown("<h1>Pricing Plans</h1>", unsafe_allow_html=True)
 
     col1, col2, col3 = st.columns(3)
@@ -611,6 +635,9 @@ def pricing_page():
         )
 
 
+    col1, col2, col3 = st.columns(3)
+
+    
 pricing_page()
 
 # Page 4: About Loyalytics
