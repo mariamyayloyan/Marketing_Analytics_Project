@@ -4,22 +4,26 @@ import sqlalchemy
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import LogisticRegression
+from dotenv import load_dotenv
+
 import sys
 import os
 
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
-sys.path.append(project_root)
+# Add the parent directory of `app_components` to sys.path
+current_dir = os.path.dirname(os.path.abspath(__file__))  # Path to `app_components/ds`
+project_root = os.path.abspath(os.path.join(current_dir, ".."))  # Path to `app_components`
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
 
-from app_components.etl.Database.database import engine
+from database import *
 
-"""
-This module builds a logistic regression model for churn prediction and updates the database.
-"""
+load_dotenv(".env")
 
+DATABASE_URL = os.environ.get("DATABASE_URL")
 
-""" Fetching data from database """
+engine = create_engine(DATABASE_URL)
 
-def fetch_table_as_dataframe(table_name: str) -> pd.DataFrame:
+def fetch_table_as_dataframe(table_name):
     """
     Fetch data from a specific database table and return it as a Pandas DataFrame.
 
@@ -38,6 +42,7 @@ def fetch_table_as_dataframe(table_name: str) -> pd.DataFrame:
         return df
 
 
+
 customer = fetch_table_as_dataframe("customer")
 location = fetch_table_as_dataframe("location")
 plan = fetch_table_as_dataframe("plan")
@@ -47,16 +52,15 @@ notification = fetch_table_as_dataframe("notification")
 subscription = fetch_table_as_dataframe("subscription")
 results = fetch_table_as_dataframe("results")
 
-
 """Merging tables"""
 merged_table = customer.merge(subscription, on='customer_id', how='inner')
-merged_table = merged_table.merge(application, left_on='application_id', right_on='app_id',  how='inner')
+merged_table = merged_table.merge(application, left_on='application_id', right_on='app_id', how='inner')
 merged_table = merged_table.merge(location, on='location_id', how='inner')
 merged_table = merged_table.merge(price, left_on='price_id', right_on='id', how='inner')
 merged_table = merged_table.merge(notification, on='notification_id', how='inner')
 merged_table = merged_table.merge(plan, left_on='plan_type_id', right_on='plan_id', how='inner')
-
-
+#merged_table = merged_table.merge(results, on='customer_id', how='inner')
+#print(merged_table.head())
 
 
 """ Cleaning  and labeling data"""
@@ -92,7 +96,7 @@ churn_rate = merged_table['is_churned'].mean()
 print(f"Churn Rate: {churn_rate:.2%}")
 
 
-""" Logistic regression model building """
+""" Model building """
 
 # Define features  and target
 X = merged_table.drop(columns=['status', 'is_churned'])
@@ -126,16 +130,8 @@ y_proba_full = log_reg_model.predict_proba(X_full)[:, 1]
 
 results['churn_probability'] = y_proba_full
 
-def update_results_table(results_df: pd.DataFrame) -> None:
-    """
-       Update the results table with churn probabilities.
-
-       Args:
-           results_df (pd.DataFrame): The DataFrame containing the results to update.
-
-       Returns:
-           None
-       """
+# Define function to update results table in the database
+def update_results_table(results_df):
     try:
         with engine.connect() as connection:
             # Write to the database, updating existing rows
@@ -150,3 +146,136 @@ update_results_table(results)
 
 updated_results = fetch_table_as_dataframe("results")
 print(updated_results.head())
+
+from final_model import *
+from sklearn.cluster import KMeans, AgglomerativeClustering
+from sklearn.metrics import silhouette_score
+from sklearn.decomposition import PCA
+from scipy.cluster.hierarchy import dendrogram, linkage
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+
+# Prepare data for clustering
+X_clustering = X_full.copy()
+
+# K-Means Clustering
+
+# Elbow Method
+inertia = []
+k_values = range(1, 11)
+for k in k_values:
+    kmeans = KMeans(n_clusters=k, random_state=42)
+    kmeans.fit(X_clustering)
+    inertia.append(kmeans.inertia_)
+
+plt.figure(figsize=(8, 5))
+plt.plot(k_values, inertia, marker='o', linestyle='--')
+plt.title("Elbow Method")
+plt.xlabel("Number of Clusters (k)")
+plt.ylabel("Inertia")
+plt.grid()
+plt.show()
+
+# Choosing an optimal number of clusters
+optimal_k = 4
+kmeans = KMeans(n_clusters=optimal_k, random_state=42)
+cluster_labels_kmeans = kmeans.fit_predict(X_clustering)
+
+
+# Silhouette Score for K-Means
+silhouette_scores_kmeans = []
+for k in range(2, 11):
+    kmeans = KMeans(n_clusters=k, random_state=42)
+    cluster_labels = kmeans.fit_predict(X_clustering)
+    score = silhouette_score(X_clustering, cluster_labels)
+    silhouette_scores_kmeans.append(score)
+    print(f"K-Means Silhouette Score for k={k}: {score:.3f}")
+
+# Adding cluster labels to the DataFrame
+X_clustering['Cluster_KMeans'] = cluster_labels_kmeans
+
+# Visualizing K-Means Clusters using PCA
+pca = PCA(n_components=2)
+X_pca = pca.fit_transform(X_clustering.drop(columns=['Cluster_KMeans']))
+X_clustering_pca = pd.DataFrame(X_pca, columns=['PCA1', 'PCA2'])
+X_clustering_pca['Cluster_KMeans'] = cluster_labels_kmeans
+
+plt.figure(figsize=(8, 5))
+sns.scatterplot(data=X_clustering_pca, x='PCA1', y='PCA2', hue='Cluster_KMeans', palette='tab10', s=50)
+plt.title("K-Means Clusters Visualization (PCA)")
+plt.xlabel("PCA Component 1")
+plt.ylabel("PCA Component 2")
+plt.grid()
+plt.legend()
+plt.show()
+
+# Hierarchical Clustering
+
+# Plotting the Dendrogram
+linked = linkage(X_clustering, method='ward')
+
+plt.figure(figsize=(10, 7))
+dendrogram(linked, truncate_mode='lastp', p=10, leaf_rotation=45, leaf_font_size=10)
+plt.title("Hierarchical Clustering Dendrogram")
+plt.xlabel("Number of Points in Node (Cluster Size)")
+plt.ylabel("Distance")
+plt.grid()
+plt.show()
+
+# Applying Agglomerative Clustering
+optimal_clusters_hierarchical = 4
+hierarchical_clustering = AgglomerativeClustering(n_clusters=optimal_clusters_hierarchical)
+cluster_labels_hierarchical = hierarchical_clustering.fit_predict(X_clustering)
+
+X_clustering['Cluster_Hierarchical'] = cluster_labels_hierarchical
+
+# Visualizing Hierarchical Clusters using PCA
+X_clustering_pca['Cluster_Hierarchical'] = cluster_labels_hierarchical
+
+plt.figure(figsize=(8, 5))
+sns.scatterplot(data=X_clustering_pca, x='PCA1', y='PCA2', hue='Cluster_Hierarchical', palette='tab10', s=50)
+plt.title(f"Hierarchical Clusters Visualization (PCA, n_clusters={optimal_clusters_hierarchical})")
+plt.xlabel("PCA Component 1")
+plt.ylabel("PCA Component 2")
+plt.grid()
+plt.legend()
+plt.show()
+
+""" We will proceed with 4 clusters and K-means clustering"""
+
+customer_clusters = customer.copy()
+customer_clusters['Cluster_KMeans'] = cluster_labels_kmeans
+
+# Display customers and their clusters
+print("Customers with their K-Means:")
+print(customer_clusters[['customer_id', 'Cluster_KMeans']])
+
+"""Printing clustering summary """
+X_clustering['Cluster'] = cluster_labels_kmeans
+cluster_summary = X_clustering.groupby('Cluster').mean().reset_index()
+print(cluster_summary)
+
+cluster_summary.to_csv('cluster_summary.csv', index=False)
+
+
+
+""" Updating results table with cluster_numbers"""
+
+results['cluster_number'] = cluster_labels_kmeans
+
+def update_results_with_clusters(results_df):
+    try:
+        with engine.connect() as connection:
+            results_df.to_sql('results', con=connection, if_exists='replace', index=False)
+            print("Results table updated successfully with cluster numbers!")
+    except Exception as e:
+        print(f"Failed to update results table: {e}")
+
+# Update the database
+update_results_with_clusters(results)
+
+# Verify the updated results
+updated_results = fetch_table_as_dataframe("results")
+print(updated_results.head())
+
